@@ -1,0 +1,756 @@
+{% extends 'base.html' %}
+
+
+{% block title %} Daily Logs {% endblock %}
+
+
+{% block css %}
+
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row mt-4">
+
+    
+    <div class="col-lg-9 mb-lg-0 mb-4">
+      <div class="card ">
+        <div class="card-header pb-0 p-3">
+
+          <div class="row gx-4">
+            <div class="col-lg-8 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+              <div class="nav-wrapper position-relative end-0">
+                  <ul class="nav nav-pills nav-fill p-1" role="tablist">
+                      <li class="nav-item">
+                          <a class="nav-link mb-0 px-0 py-1 active d-flex align-items-center justify-content-center" data-bs-toggle="tab" href="#cc" role="tab" aria-selected="true">
+                              <i class="ni ni-app"></i>
+                              <span class="ms-2">Clinic Consultation</span>
+                          </a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="nav-link mb-0 px-0 py-1 d-flex align-items-center justify-content-center" data-bs-toggle="tab" href="#bp" role="tab" aria-selected="false">
+                              <i class="ni ni-email-83"></i>
+                              <span class="ms-2">BP Monitoring</span>
+                          </a>
+                      </li>
+
+
+                      <li class="nav-item">
+                        <a class="nav-link mb-0 px-0 py-1 d-flex align-items-center justify-content-center" data-bs-toggle="tab" href="#dc" role="tab" aria-selected="false">
+                            <i class="fa fa-paper-plane"></i>
+                            <span class="ms-2">Dental Case</span>
+                        </a>
+                      </li>
+
+                      <!--
+                      <li class="nav-item">
+                        <a class="nav-link mb-0 px-0 py-1 d-flex align-items-center justify-content-center" data-bs-toggle="tab" href="#vac" role="tab" aria-selected="false">
+                            <i class="fa fa-paper-plane"></i>
+                            <span class="ms-2">Vaccination</span>
+                        </a>
+                      </li>
+                    -->
+
+                  </ul>
+              </div>
+          </div>
+            <div class="col-lg-4 my-auto mt-3 d-flex justify-content-end">
+
+              <button class="btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#add_cc"><i class="fa fa-plus-circle fa-5x mx-1"></i>Add New</button>
+                
+             
+
+            </div>
+
+
+
+
+
+          </div>
+
+          <div class="tab-content">
+
+              <div class="tab-pane fade show active" id="cc" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mt-3">
+
+                  <h4 class="">Clinic Consultation Content</h4>
+                </div>
+
+
+
+                {% if clinic_consultation %}
+                  <div class="table-responsive">
+                    <table class="table align-items-center mb-0">
+                      <thead>
+                        <tr>
+                          <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                          <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Patient</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Category</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Chief Complaint</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Remarks</th>
+                          <th class="text-secondary opacity-7"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        
+                        {% for cc in clinic_consultation %}
+                        <tr>
+                          <td class="text-center">
+                            <span class="text-secondary text-xs font-weight-bold">{{ cc.id }}</span>
+                          </td>
+                          <td class=" text-center">
+                            <span class="text-secondary text-xs font-weight-bold">{{ cc.date_created | date}} - {{ cc.date_created | time}} </span>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="{{ cc.patient.avatar.url }}" class="avatar avatar-sm me-3" alt="user1">
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm text-capitalize">{{ cc.patient.user.first_name}} {{ cc.patient.user.last_name}} ({{ cc.patient.gender}}, {{ cc.patient.age}})</h6>
+                                <p class="text-xs text-secondary mb-0">{{ cc.patient.user.email}}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="text-center">
+                            <p class="text-xs font-weight-bold mb-0">{{ cc.patient.category}}</p>
+                            <p class="text-xs text-secondary mb-0">{{ cc.patient.designation}}</p>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="">{{ cc.chief_complaint }}</span>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="">{{ cc.remarks }}</span>
+                          </td>
+                          <td class="align-middle">
+                            <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip"
+                              data-original-title="View user">
+                              View
+                            </a>
+                          </td>
+                        </tr>
+                        {% endfor %}
+
+
+                      </tbody>
+                    </table>
+                  </div>
+                  {% else %}
+
+                        
+                  <p>No Clinic Consulation Records Found!</p>
+
+                {% endif %}
+              </div>
+
+              <div class="tab-pane fade" id="bp" role="tabpanel">
+                
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                <h4 class="mt-3">BP Monitoring Content</h4>
+                
+                </div>
+
+
+                {% if BPMonitoring %}
+                  <div class="table-responsive">
+                    <table class="table align-items-center mb-0">
+                      <thead>
+                        <tr>
+                          <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                          <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Patient</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Category</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Systolic / Diastolic </th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Heart Rate </th>
+                    
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Remarks </th>
+                          <th class="text-secondary opacity-7"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        
+                        {% for bp in BPMonitoring %}
+                        <tr>
+                          <td class="text-center">
+                            <span class="text-secondary text-xs font-weight-bold">{{ bp.id }}</span>
+                          </td>
+                          <td class=" text-center">
+                            <span class="text-secondary text-xs font-weight-bold">{{ bp.date_created | date}} - {{ bp.date_created | time}} </span>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="{{ bp.patient.avatar.url }}" class="avatar avatar-sm me-3" alt="user1">
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm text-capitalize">{{ bp.patient.user.first_name}} {{ bp.patient.user.last_name}} ({{ bp.patient.gender}}, {{ bp.patient.age}})</h6>
+                                <p class="text-xs text-secondary mb-0">{{ bp.patient.user.email}}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="text-center">
+                            <p class="text-xs font-weight-bold mb-0">{{ bp.patient.category}}</p>
+                            <p class="text-xs text-secondary mb-0">{{ bp.patient.designation}}</p>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="">{{ bp.systolic }} / {{bp.diastolic}}</span>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="">{{ bp.heart_rate }}</span>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="">{{ bp.remarks }}</span>
+                          </td>
+                          <td class="align-middle">
+                            <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip"
+                              data-original-title="View user">
+                              View
+                            </a>
+                          </td>
+                        </tr>
+                        {% endfor %}
+
+
+                      </tbody>
+                    </table>
+                  </div>
+                  {% else %}
+
+                        
+                  <p>This is the content for the CC tab. Place the settings options or configurations here.</p>
+
+                {% endif %}
+              </div>
+
+              <div class="tab-pane fade" id="dc" role="tabpanel">
+                  <div class="d-flex justify-content-between align-items-center mt-3">
+                    <h4 class="mt-3">Dental Case logs</h4>
+                    
+                  </div>
+                {% if dental_case %}
+                  <div class="table-responsive">
+                    <table class="table align-items-center mb-0">
+                      <thead>
+                        <tr>
+                          <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                          <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Patient</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Category</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Treatment needed </th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Remarks</th>
+                    
+                          <th class="text-secondary opacity-7"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        
+                        {% for bp in dental_case %}
+                        <tr>
+                          <td class="text-center">
+                            <span class="text-secondary text-xs font-weight-bold">{{ bp.id }}</span>
+                          </td>
+                          <td class=" text-center">
+                            <span class="text-secondary text-xs font-weight-bold">{{ bp.date_created | date}} - {{ bp.date_created | time}} </span>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="{{ bp.patient.avatar.url }}" class="avatar avatar-sm me-3" alt="user1">
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm text-capitalize">{{ bp.patient.user.first_name}} {{ bp.patient.user.last_name}} ({{ bp.patient.gender}}, {{ bp.patient.age}})</h6>
+                                <p class="text-xs text-secondary mb-0">{{ bp.patient.user.email}}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="text-center">
+                            <p class="text-xs font-weight-bold mb-0">{{ bp.patient.category}}</p>
+                            <p class="text-xs text-secondary mb-0">{{ bp.patient.designation}}</p>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="">{{ bp.treatment_needed }}</span>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="">{{ bp.remarks }}</span>
+                          </td>
+                          <td class="align-middle">
+                            <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip"
+                              data-original-title="View user">
+                              View
+                            </a>
+                          </td>
+                        </tr>
+                        {% endfor %}
+
+
+                      </tbody>
+                    </table>
+                  </div>
+                  {% else %}
+
+                        
+                  <p>This is the content for the CC tab. Place the settings options or configurations here.</p>
+
+                {% endif %}
+              </div>
+
+                <!--
+              <div class="tab-pane fade" id="vac" role="tabpanel">
+                <h4 class="mt-3">Vaccination Content</h4>
+                <p>This is the content for the CC tab. Place the settings options or configurations here.</p>
+              </div>
+              -->
+
+          </div>
+
+
+
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header pb-0 p-3">
+               <h6 class="mb-0">Infirmary Management Overview</h6>
+            </div>
+            <div class="card-body p-3">
+               <ul class="list-group">
+                  <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                     <div class="d-flex align-items-center">
+                        <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
+                           <svg width="12px" height="12px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="mt-1">
+                              <title>spaceship</title>
+                              <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                 <g transform="translate(-1720.000000, -592.000000)" fill="#FFFFFF" fill-rule="nonzero">
+                                    <g transform="translate(1716.000000, 291.000000)">
+                                       <g transform="translate(4.000000, 301.000000)">
+                                          <path d="M39.3,0.706666667 C38.9660984,0.370464027 38.5048767,0.192278529 38.0316667,0.216666667 C14.6516667,1.43666667 6.015,22.2633333 5.93166667,22.4733333 C5.68236407,23.0926189 5.82664679,23.8009159 6.29833333,24.2733333 L15.7266667,33.7016667 C16.2013871,34.1756798 16.9140329,34.3188658 17.535,34.065 C17.7433333,33.98 38.4583333,25.2466667 39.7816667,1.97666667 C39.8087196,1.50414529 39.6335979,1.04240574 39.3,0.706666667 Z M25.69,19.0233333 C24.7367525,19.9768687 23.3029475,20.2622391 22.0572426,19.7463614 C20.8115377,19.2304837 19.9992882,18.0149658 19.9992882,16.6666667 C19.9992882,15.3183676 20.8115377,14.1028496 22.0572426,13.5869719 C23.3029475,13.0710943 24.7367525,13.3564646 25.69,14.31 C26.9912731,15.6116662 26.9912731,17.7216672 25.69,19.0233333 L25.69,19.0233333 Z"></path>
+                                          <path d="M1.855,31.4066667 C3.05106558,30.2024182 4.79973884,29.7296005 6.43969145,30.1670277 C8.07964407,30.6044549 9.36054508,31.8853559 9.7979723,33.5253085 C10.2353995,35.1652612 9.76258177,36.9139344 8.55833333,38.11 C6.70666667,39.9616667 0,40 0,40 C0,40 0,33.2566667 1.855,31.4066667 Z"></path>
+                                          <path d="M17.2616667,3.90166667 C12.4943643,3.07192755 7.62174065,4.61673894 4.20333333,8.04166667 C3.31200265,8.94126033 2.53706177,9.94913142 1.89666667,11.0416667 C1.5109569,11.6966059 1.61721591,12.5295394 2.155,13.0666667 L5.47,16.3833333 C8.55036617,11.4946947 12.5559074,7.25476565 17.2616667,3.90166667 L17.2616667,3.90166667 Z" opacity="0.598539807"></path>
+                                          <path d="M36.0983333,22.7383333 C36.9280725,27.5056357 35.3832611,32.3782594 31.9583333,35.7966667 C31.0587397,36.6879974 30.0508686,37.4629382 28.9583333,38.1033333 C28.3033941,38.4890431 27.4704606,38.3827841 26.9333333,37.845 L23.6166667,34.53 C28.5053053,31.4496338 32.7452344,27.4440926 36.0983333,22.7383333 L36.0983333,22.7383333 Z" opacity="0.598539807"></path>
+                                       </g>
+                                    </g>
+                                 </g>
+                              </g>
+                           </svg>
+                        </div>
+                        <div class="d-flex flex-column">
+                           <h6 class="mb-1 text-dark text-sm">Clinic Consultation</h6>
+                           <span class="text-xs">{{ clinic_patients_today.count }} Clinic Consultations Today, <span class="font-weight-bold">{{ clinic_consultation.count }} Total Patient Records</span></span>
+                        </div>
+                     </div>
+                     <div class="d-flex">
+                        <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
+                     </div>
+                  </li>
+                  <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                    <div class="d-flex align-items-center">
+                       <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
+                          <svg width="12px" height="12px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="mt-1">
+                             <title>spaceship</title>
+                             <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                <g transform="translate(-1720.000000, -592.000000)" fill="#FFFFFF" fill-rule="nonzero">
+                                   <g transform="translate(1716.000000, 291.000000)">
+                                      <g transform="translate(4.000000, 301.000000)">
+                                         <path d="M39.3,0.706666667 C38.9660984,0.370464027 38.5048767,0.192278529 38.0316667,0.216666667 C14.6516667,1.43666667 6.015,22.2633333 5.93166667,22.4733333 C5.68236407,23.0926189 5.82664679,23.8009159 6.29833333,24.2733333 L15.7266667,33.7016667 C16.2013871,34.1756798 16.9140329,34.3188658 17.535,34.065 C17.7433333,33.98 38.4583333,25.2466667 39.7816667,1.97666667 C39.8087196,1.50414529 39.6335979,1.04240574 39.3,0.706666667 Z M25.69,19.0233333 C24.7367525,19.9768687 23.3029475,20.2622391 22.0572426,19.7463614 C20.8115377,19.2304837 19.9992882,18.0149658 19.9992882,16.6666667 C19.9992882,15.3183676 20.8115377,14.1028496 22.0572426,13.5869719 C23.3029475,13.0710943 24.7367525,13.3564646 25.69,14.31 C26.9912731,15.6116662 26.9912731,17.7216672 25.69,19.0233333 L25.69,19.0233333 Z"></path>
+                                         <path d="M1.855,31.4066667 C3.05106558,30.2024182 4.79973884,29.7296005 6.43969145,30.1670277 C8.07964407,30.6044549 9.36054508,31.8853559 9.7979723,33.5253085 C10.2353995,35.1652612 9.76258177,36.9139344 8.55833333,38.11 C6.70666667,39.9616667 0,40 0,40 C0,40 0,33.2566667 1.855,31.4066667 Z"></path>
+                                         <path d="M17.2616667,3.90166667 C12.4943643,3.07192755 7.62174065,4.61673894 4.20333333,8.04166667 C3.31200265,8.94126033 2.53706177,9.94913142 1.89666667,11.0416667 C1.5109569,11.6966059 1.61721591,12.5295394 2.155,13.0666667 L5.47,16.3833333 C8.55036617,11.4946947 12.5559074,7.25476565 17.2616667,3.90166667 L17.2616667,3.90166667 Z" opacity="0.598539807"></path>
+                                         <path d="M36.0983333,22.7383333 C36.9280725,27.5056357 35.3832611,32.3782594 31.9583333,35.7966667 C31.0587397,36.6879974 30.0508686,37.4629382 28.9583333,38.1033333 C28.3033941,38.4890431 27.4704606,38.3827841 26.9333333,37.845 L23.6166667,34.53 C28.5053053,31.4496338 32.7452344,27.4440926 36.0983333,22.7383333 L36.0983333,22.7383333 Z" opacity="0.598539807"></path>
+                                      </g>
+                                   </g>
+                                </g>
+                             </g>
+                          </svg>
+                       </div>
+                       <div class="d-flex flex-column">
+                          <h6 class="mb-1 text-dark text-sm">BP Monitoring</h6>
+                          <span class="text-xs">{{bp_patients_today.count}} BP Records Today, <span class="font-weight-bold">{{ BPMonitoring.count}} Total Patient Records</span></span>
+                       </div>
+                    </div>
+                    <div class="d-flex">
+                       <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
+                    </div>
+                  </li>
+                  <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                    <div class="d-flex align-items-center">
+                       <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
+                          <svg width="12px" height="12px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="mt-1">
+                             <title>spaceship</title>
+                             <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                <g transform="translate(-1720.000000, -592.000000)" fill="#FFFFFF" fill-rule="nonzero">
+                                   <g transform="translate(1716.000000, 291.000000)">
+                                      <g transform="translate(4.000000, 301.000000)">
+                                         <path d="M39.3,0.706666667 C38.9660984,0.370464027 38.5048767,0.192278529 38.0316667,0.216666667 C14.6516667,1.43666667 6.015,22.2633333 5.93166667,22.4733333 C5.68236407,23.0926189 5.82664679,23.8009159 6.29833333,24.2733333 L15.7266667,33.7016667 C16.2013871,34.1756798 16.9140329,34.3188658 17.535,34.065 C17.7433333,33.98 38.4583333,25.2466667 39.7816667,1.97666667 C39.8087196,1.50414529 39.6335979,1.04240574 39.3,0.706666667 Z M25.69,19.0233333 C24.7367525,19.9768687 23.3029475,20.2622391 22.0572426,19.7463614 C20.8115377,19.2304837 19.9992882,18.0149658 19.9992882,16.6666667 C19.9992882,15.3183676 20.8115377,14.1028496 22.0572426,13.5869719 C23.3029475,13.0710943 24.7367525,13.3564646 25.69,14.31 C26.9912731,15.6116662 26.9912731,17.7216672 25.69,19.0233333 L25.69,19.0233333 Z"></path>
+                                         <path d="M1.855,31.4066667 C3.05106558,30.2024182 4.79973884,29.7296005 6.43969145,30.1670277 C8.07964407,30.6044549 9.36054508,31.8853559 9.7979723,33.5253085 C10.2353995,35.1652612 9.76258177,36.9139344 8.55833333,38.11 C6.70666667,39.9616667 0,40 0,40 C0,40 0,33.2566667 1.855,31.4066667 Z"></path>
+                                         <path d="M17.2616667,3.90166667 C12.4943643,3.07192755 7.62174065,4.61673894 4.20333333,8.04166667 C3.31200265,8.94126033 2.53706177,9.94913142 1.89666667,11.0416667 C1.5109569,11.6966059 1.61721591,12.5295394 2.155,13.0666667 L5.47,16.3833333 C8.55036617,11.4946947 12.5559074,7.25476565 17.2616667,3.90166667 L17.2616667,3.90166667 Z" opacity="0.598539807"></path>
+                                         <path d="M36.0983333,22.7383333 C36.9280725,27.5056357 35.3832611,32.3782594 31.9583333,35.7966667 C31.0587397,36.6879974 30.0508686,37.4629382 28.9583333,38.1033333 C28.3033941,38.4890431 27.4704606,38.3827841 26.9333333,37.845 L23.6166667,34.53 C28.5053053,31.4496338 32.7452344,27.4440926 36.0983333,22.7383333 L36.0983333,22.7383333 Z" opacity="0.598539807"></path>
+                                      </g>
+                                   </g>
+                                </g>
+                             </g>
+                          </svg>
+                       </div>
+                       <div class="d-flex flex-column">
+                          <h6 class="mb-1 text-dark text-sm">Dental Cases</h6>
+                          <span class="text-xs">{{ dental_patients_today.count }} Dental Patients Today, <span class="font-weight-bold">{{ dental_case.count }} Total Patient Records</span></span>
+                       </div>
+                    </div>
+                    <div class="d-flex">
+                       <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
+                    </div>
+                  </li>
+
+
+               </ul>
+            </div>
+        </div>
+    </div>
+    
+  
+</div>
+
+<!-- MODALS -->
+
+
+<!-- Button trigger modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="add_cc" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Patient Log</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" id="clinic-consultation-form">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-7">
+              <div class="form-group">
+                <label for="patient_name">Patient:</label>
+                <input type="text" required class="form-control" id="patient_name" placeholder="Search User ID">
+              </div>
+              <li class="list-group-item cursor-pointer text-sm" id="patient_suggestions"></li>
+
+              <span id="no_record" style="display: none;">No matching records found.</span>
+              <input type="hidden" required name="patient_id" id="patient_id">
+
+            </div>
+            <div class="col-md-5">
+              <div class="form-group">
+                <label for="select_log">Please Select:</label>
+                <select class="form-control" id="select_log" name="consultation_type">
+                  <option value="">-- Select an option --</option>
+                  <option value="clinic_consultation">Clinic Consultation</option>
+                  <option value="bp_monitoring">BP Monitoring</option>
+                  <option value="dental_case">Dental Case</option>
+                  <option value="vaccination">Vaccination</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <div id="clinic_consultation" class="form-section">
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div class="form-group">
+                      <label for="chief_complaint">Chief Complaint:</label>
+                      <textarea class="form-control" name="chief_complaint" id="chief_complaint" rows="2"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-lg-12">
+                    <div class="form-group">
+                      <label for="remarks">Remarks:</label>
+                      <textarea class="form-control" name="remarks" id="remarks" rows="2"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="bp_monitoring" class="form-section">
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="form-group">
+                      <label for="systolic">Systolic:</label>
+                      <input type="text" class="form-control" name="systolic" id="systolic" placeholder="Systolic">
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group">
+                      <label for="diastolic">Diastolic:</label>
+                      <input type="text" class="form-control" name="diastolic" id="diastolic" placeholder="Diastolic">
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group">
+                      <label for="heart_rate">Heart Rate:</label>
+                      <input type="text" class="form-control" name="heart_rate" id="heart_rate" placeholder="Heart Rate">
+                    </div>
+                  </div>
+                  <div class="col-lg-12">
+                    <div class="form-group">
+                      <label for="bp_remarks">Remarks:</label>
+                      <textarea class="form-control" name="bp_remarks" id="bp_remarks" rows="2"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="dental_case" class="form-section">
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div class="form-group">
+                      <label for="treatment_needed">Treatment needed:</label>
+                      <textarea class="form-control" name="treatment_needed" id="treatment_needed" rows="2"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-lg-12">
+                    <div class="form-group">
+                      <label for="dental_remarks">Remarks:</label>
+                      <textarea class="form-control" name="dental_remarks" id="dental_remarks" rows="2"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="modal-footer">
+          <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn bg-gradient-primary">Save changes</button>
+        </div>
+      </form>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+{% endblock %}
+
+{% block js %}
+
+
+<script>
+  $(document).ready(function() {
+      $('#patient_name').keyup(function() {
+        const searchTerm = $(this).val().trim();
+    
+        if (searchTerm.length >= 2) {  
+          $.ajax({
+            url: '{% url "search-patient" %}',  
+            type: 'GET',
+            dataType: 'json',
+            data: { term: searchTerm },  
+            beforeSend: function(xhr) {
+              xhr.setRequestHeader('X-CSRFToken', $('meta[name="csrf-token"]').attr('content'));
+            },
+            success: function(response) {
+              const suggestionsList = $('#patient_suggestions');  
+              const no_record = $('#no_record')
+              suggestionsList.empty();  
+          
+              if (response.length > 0) {
+                  suggestionsList.show();  
+                  for (const suggestion of response) {
+                      const suggestionItem = $('<li>').text(suggestion.name);  
+                      suggestionItem.click(function() {  
+                          $('#patient_name').val(suggestion.name); 
+                          $('#patient_id').val(suggestion.id);  
+                          suggestionsList.hide(); 
+                          no_record.hide()
+                      });
+                      suggestionsList.append(suggestionItem); 
+                  }
+              } else {
+                  suggestionsList.hide();  
+                  no_record.show()
+              }
+              },
+          
+            error: function(xhr, errmsg, err) {
+              console.error('Error fetching suggestions:', errmsg, err);
+            }
+          });
+        } else {
+          $('#patient_suggestions').hide();  
+          $('#no_record').hide()
+        }
+      });
+    });
+    
+  
+</script>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Select the form element
+    const form = document.getElementById('clinic-consultation-form');
+
+    // Handle form submission
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();  // Prevent the default form submission
+
+      // Get form data
+      const formData = new FormData(form);
+
+      // Get CSRF token from the form
+      const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+      // Show loading spinner
+      Swal.fire({
+        title: 'Processing...',
+        text: 'Please wait while we add the consultation.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Send AJAX request
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': csrfToken  // Include CSRF token in the request headers
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Hide loading spinner and show success message
+        Swal.fire({
+          title: 'Success!',
+          text: data.message,
+          icon: 'success',
+          timer: 1000,  // Auto-close after 3 seconds
+          timerProgressBar: true,
+          showConfirmButton: false,
+          willClose: () => {
+            // Redirect to /daily-logs/ after the alert is closed
+            window.location.href = '/daily-logs/';
+          }
+        });
+      })
+      .catch(error => {
+        // Hide loading spinner and show error message
+        Swal.fire({
+          title: 'Error!',
+          text: 'An error occurred while adding the consultation.',
+          icon: 'error',
+          timer: 3000,  // Auto-close after 3 seconds
+          timerProgressBar: true,
+          willClose: () => {
+            // Redirect to /daily-logs/ after the alert is closed
+            window.location.href = '/daily-logs/';
+          }
+        });
+      });
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const selectLog = document.getElementById('select_log');
+    const sections = document.querySelectorAll('.form-section');
+
+    function showSection(sectionId) {
+        sections.forEach(section => {
+            if (section.id === sectionId) {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        });
+    }
+
+    function updateRequiredFields(sectionId) {
+        sections.forEach(section => {
+            const inputs = section.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                if (section.id === sectionId) {
+                    input.setAttribute('required', 'required');
+                } else {
+                    input.removeAttribute('required');
+                }
+            });
+        });
+    }
+
+    selectLog.addEventListener('change', function() {
+        const selectedValue = this.value;
+        switch (selectedValue) {
+            case 'clinic_consultation':
+                showSection('clinic_consultation');
+                $('#clinic-consultation-form').attr('action', '{% url "add-clinic-consultation" %}');
+                break;
+            case 'bp_monitoring':
+                showSection('bp_monitoring');
+                $('#clinic-consultation-form').attr('action', '{% url "add-bp-monitoring" %}');
+                break;
+            case 'dental_case':
+                showSection('dental_case');
+                $('#clinic-consultation-form').attr('action', '{% url "add-dental-case" %}');
+                break;
+            default:
+                sections.forEach(section => section.style.display = 'none');
+                $('#clinic-consultation-form').attr('action', '#'); // Clear action if no option selected
+                break;
+        }
+        updateRequiredFields(selectLog.value);
+    });
+
+    // Initial setup
+    showSection(selectLog.value);
+    updateRequiredFields(selectLog.value);
+
+    // Add form submission validation
+    document.getElementById('clinic-consultation-form').addEventListener('submit', function(event) {
+        const selectedValue = selectLog.value;
+        let isValid = true;
+
+        // Check if required fields are filled based on the selected consultation type
+        if (selectedValue === 'clinic_consultation') {
+            const chiefComplaint = document.getElementById('chief_complaint').value.trim();
+            const remarks = document.getElementById('remarks').value.trim();
+            if (!chiefComplaint || !remarks) {
+                isValid = false;
+                alert('Please fill in all required fields for Clinic Consultation.');
+            }
+        } else if (selectedValue === 'bp_monitoring') {
+            const systolic = document.getElementById('systolic').value.trim();
+            const diastolic = document.getElementById('diastolic').value.trim();
+            const heartRate = document.getElementById('heart_rate').value.trim();
+            if (!systolic || !diastolic || !heartRate) {
+                isValid = false;
+                alert('Please fill in all required fields for BP Monitoring.');
+            }
+        } else if (selectedValue === 'dental_case') {
+            const treatmentNeeded = document.getElementById('treatment_needed').value.trim();
+            const dentalRemarks = document.getElementById('dental_remarks').value.trim();
+            if (!treatmentNeeded || !dentalRemarks) {
+                isValid = false;
+                alert('Please fill in all required fields for Dental Case.');
+            }
+        }
+
+        if (!isValid) {
+            event.preventDefault(); // Prevent form submission if validation fails
+        }
+    });
+});
+
+</script>
+
+{% endblock %}

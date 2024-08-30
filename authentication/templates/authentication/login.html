@@ -1,0 +1,55 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %} Login Account {% endblock %}
+
+
+{% block stylesheet %}
+
+{% endblock %}
+
+
+{% block content%}
+
+
+
+<div class="row mt-lg-n10 mt-md-n11 mt-n10 justify-content-center">
+    <div class="col-xl-4 col-lg-5 col-md-7 mx-auto">
+      <div class="card z-index-0">
+        <div class="card-header text-center pt-4">
+          <h5>Login Account</h5>
+          
+          {% if messages%}
+            {% for msg in messages %}
+                {{ msg }}
+            {% endfor %}
+          {% endif %}
+
+        </div>
+
+        <div class="card-body">
+          <form role="form" action="{% url 'login-user' %}" method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <input type="text" name="username" class="form-control" placeholder="User ID" aria-label="Name">
+            </div>
+            <div class="mb-3">
+              <input type="password" name="password" class="form-control" placeholder="Password" aria-label="Password">
+            </div>
+
+            <div class="text-center">
+              <button type="submit" class="btn bg-gradient-dark w-100 my-4 mb-2">Login</button>
+            </div>
+            <p class="text-sm mt-3 mb-0">Don't have an account? <a href="{% url 'register-page' %}" class="text-dark font-weight-bolder">Sign up</a></p>
+          </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block js %}
+
+{% endblock %}

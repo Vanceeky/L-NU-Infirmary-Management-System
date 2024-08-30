@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+
+
+{% block title %} Dashboard {% endblock %}
+
+
+{% block css %}
+
+
+{% endblock %}
+
+{% block content %}
+
+
+
+<div class="row mt-4 h-auto">
+  <div class="col-lg-7 mb-lg-0 mb-4">
+    <div class="card z-index-2 h-auto">
+      <div class="card-header pb-0 pt-3 bg-transparent">
+        <h6 class="text-capitalize">Patient overview</h6>
+        <p class="text-sm mb-0">
+          <i class="fa fa-arrow-up text-success"></i>
+          <span class="font-weight-bold">4% more</span> in 2023
+        </p>
+      </div>
+      <div class="card-body p-3">
+        <div class="chart">
+          <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card card-carousel overflow-hidden h-auto p-3">
+      <div class="row">
+        <div class="col-xl-6 col-sm-3 col-md-6 mb-3">
+          <div class="card bg-gradient-info text-white">
+            <div class="card-body p-3">
+              <div class="row">
+                <div class="col-8">
+                  <div class="numbers">
+                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Patients</p>
+                    <h5 class="font-weight-bolder text-white">
+                      150
+                    </h5>
+
+                  </div>
+                </div>
+                <div class="col-4 text-end">
+                  <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+                    <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-6 col-sm-3 col-md-6 mb-3">
+          <div class="card bg-gradient-info text-white">
+            <div class="card-body p-3">
+              <div class="row">
+                <div class="col-8">
+                  <div class="numbers">
+                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Appointments</p>
+                    <h5 class="font-weight-bolder text-white">
+                      10
+                    </h5>
+                  </div>
+                </div>
+                <div class="col-4 text-end">
+                  <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+                    <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-6 col-sm-3 col-md-6">
+          <div class="card bg-gradient-info text-white">
+            <div class="card-body p-3">
+              <div class="row">
+                <div class="col-8">
+                  <div class="numbers">
+                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Test</p>
+                    <h5 class="font-weight-bolde text-white">
+                      1234
+                    </h5>
+
+                  </div>
+                </div>
+                <div class="col-4 text-end">
+                  <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+                    <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-6 col-sm-3 col-md-6">
+          <div class="card bg-gradient-info text-white">
+            <div class="card-body p-3">
+              <div class="row">
+                <div class="col-8">
+                  <div class="numbers">
+                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Test</p>
+                    <h5 class="font-weight-bolder text-white">
+                      1234
+                    </h5>
+
+                  </div>
+                </div>
+                <div class="col-4 text-end">
+                  <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+                    <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 mx-3 bg-0 p-2">
+          <h6 class="mb-0">Requests</h6>
+          <ul class="list-group">
+            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+              <div class="d-flex align-items-center">
+                <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
+                  <i class="ni ni-mobile-button text-white opacity-10"></i>
+                </div>
+                <div class="d-flex flex-column">
+                  <h6 class="mb-1 text-dark text-sm">Medical Certificate</h6>
+                  <span class="text-xs">250 issued, <span class="font-weight-bold">346 pending</span></span>
+                </div>
+              </div>
+              <div class="d-flex">
+                <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i
+                    class="ni ni-bold-right" aria-hidden="true"></i></button>
+              </div>
+            </li>
+            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-0 border-radius-lg">
+              <div class="d-flex align-items-center">
+                <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
+                  <i class="ni ni-mobile-button text-white opacity-10"></i>
+                </div>
+                <div class="d-flex flex-column">
+                  <h6 class="mb-1 text-dark text-sm">Appointments</h6>
+                  <span class="text-xs">250 completed, <span class="font-weight-bold">346 pending</span></span>
+                </div>
+              </div>
+              <div class="d-flex">
+                <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i
+                    class="ni ni-bold-right" aria-hidden="true"></i></button>
+              </div>
+            </li>
+
+          </ul>
+        </div>
+
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-4">
+    <div class="card h-auto mb-4">
+        <div class="card-header pb-0 px-3">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="mb-0">Appointments</h6>
+                </div>
+                <div class="col-md-6 d-flex justify-content-end align-items-center">
+                    <i class="far fa-calendar-alt me-2" aria-hidden="true"></i>
+                    <small>23 - 30 July 2024</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-body pt-4 p-3">
+            <h6 class="text-uppercase text-body text-xs font-weight-bolder mb-3">Today</h6>
+            <ul class="list-group">
+
+                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
+                        <div class="d-flex flex-column">
+                            <h6 class="mb-1 text-dark text-sm">James Ivan Mingarine</h6>
+                            <span class="text-xs">27 March 2024, at 04:30 AM</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+                        +
+                    </div>
+                </li>
+
+
+            </ul>
+
+            <h6 class="text-uppercase text-body text-xs font-weight-bolder mb-3">Tomorrow</h6>
+            <ul class="list-group">
+
+                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
+                        <div class="d-flex flex-column">
+                            <h6 class="mb-1 text-dark text-sm">James Ivan Mingarine</h6>
+                            <span class="text-xs">27 March 2024, at 04:30 AM</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+                        +
+                    </div>
+                </li>
+
+
+            </ul>
+
+        </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-8 mb-lg-0 mb-4">
+    <div class="card ">
+      <div class="card-header pb-0 p-3">
+        <div class="d-flex justify-content-between">
+          <h6 class="mb-2">Daily Patient Logs</h6>
+          <div class="form-group">
+            
+            <select class="form-control" id="exampleFormControlSelect1">
+              <option>Clinic Consultation</option>
+              <option>BP Monitoring</option>
+              <option>Vaccination</option>
+              <option>Dental Case</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-items-center mb-0">
+          <thead>
+            <tr>
+              <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+              <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Patient</th>
+              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Category</th>
+              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Chief Complaint</th>
+              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Remarks</th>
+              <th class="text-secondary opacity-7"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-center">
+                <span class="text-secondary text-xs font-weight-bold">1</span>
+              </td>
+              <td class=" text-center">
+                <span class="text-secondary text-xs font-weight-bold">July 29, 2024 - 12:00 pm </span>
+              </td>
+              <td>
+                <div class="d-flex px-2 py-1">
+                  <div>
+                    <img src="/static/assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
+                  </div>
+                  <div class="d-flex flex-column justify-content-center">
+                    <h6 class="mb-0 text-sm">John Michael</h6>
+                    <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center">
+                <p class="text-xs font-weight-bold mb-0">Student</p>
+                <p class="text-xs text-secondary mb-0">BSIT</p>
+              </td>
+              <td class="align-middle text-center text-sm">
+                <span class="">Abnominal Pain</span>
+              </td>
+              <td class="align-middle text-center text-sm">
+                <span class="">Efficient oil applied</span>
+              </td>
+              <td class="align-middle">
+                <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip"
+                  data-original-title="View user">
+                  View
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td class="text-center">
+                <span class="text-secondary text-xs font-weight-bold">1</span>
+              </td>
+              <td class=" text-center">
+                <span class="text-secondary text-xs font-weight-bold">July 29, 2024 - 12:00 pm </span>
+              </td>
+              <td>
+                <div class="d-flex px-2 py-1">
+                  <div>
+                    <img src="/static/assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
+                  </div>
+                  <div class="d-flex flex-column justify-content-center">
+                    <h6 class="mb-0 text-sm">John Michael</h6>
+                    <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center">
+                <p class="text-xs font-weight-bold mb-0">Student</p>
+                <p class="text-xs text-secondary mb-0">BSIT</p>
+              </td>
+              <td class="align-middle text-center text-sm">
+                <span class="">Abnominal Pain</span>
+              </td>
+              <td class="align-middle text-center text-sm">
+                <span class="">Efficient oil applied</span>
+              </td>
+              <td class="align-middle">
+                <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip"
+                  data-original-title="View user">
+                  View
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td class="text-center">
+                <span class="text-secondary text-xs font-weight-bold">1</span>
+              </td>
+              <td class=" text-center">
+                <span class="text-secondary text-xs font-weight-bold">July 29, 2024 - 12:00 pm </span>
+              </td>
+              <td>
+                <div class="d-flex px-2 py-1">
+                  <div>
+                    <img src="/static/assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
+                  </div>
+                  <div class="d-flex flex-column justify-content-center">
+                    <h6 class="mb-0 text-sm">John Michael</h6>
+                    <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center">
+                <p class="text-xs font-weight-bold mb-0">Student</p>
+                <p class="text-xs text-secondary mb-0">BSIT</p>
+              </td>
+              <td class="align-middle text-center text-sm">
+                <span class="">Abnominal Pain</span>
+              </td>
+              <td class="align-middle text-center text-sm">
+                <span class="">Efficient oil applied</span>
+              </td>
+              <td class="align-middle">
+                <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip"
+                  data-original-title="View user">
+                  View
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+
+{% endblock %}
