@@ -3,9 +3,15 @@ from . models import *
 from django.utils import timezone
 from django.http import JsonResponse
 from django.db.models import Q
-
+from django.core.mail import send_mail
+from django.utils import timezone
+from datetime import timedelta
 # Create your views here.
 
+
+
+def index(request):
+    return render(request, 'base/index.html')
 
 
 def dashboard(request):
@@ -43,7 +49,30 @@ def daily_logs(request):
 
 
 def appointments(request):
-    return render(request, 'base/appointments.html')
+    # Get all appointments for today
+    appointments = Appointment.objects.filter(date=timezone.now())
+
+    # Filter appointments to get those with statuses 'In Queue' and 'In Progress'
+    in_queue_appointments = appointments.filter(status='In Queue')
+    in_progress_appointments = appointments.filter(status='In Progress')
+    all_cancelled = appointments.filter(status='Cancelled').count() == appointments.count()
+    
+    # Determine if there are any appointments in queue or in progress
+    has_in_queue_appointments = in_queue_appointments.exists()
+    has_in_progress_appointments = in_progress_appointments.exists()
+
+    context = {
+        'appointments': appointments,
+        'has_in_queue_appointments': has_in_queue_appointments,
+        'has_in_progress_appointments': has_in_progress_appointments,
+        'in_queue_appointments': in_queue_appointments,
+        'in_progress_appointments': in_progress_appointments,
+
+        'all_cancelled': all_cancelled,
+    }
+    return render(request, 'base/appointments.html', context)
+
+
 
 def patients(request):
     return render(request, 'base/patients.html')
@@ -149,3 +178,148 @@ def add_dental_case(request):
         dental_case.save()
 
         return JsonResponse({'message': 'Dental case added successfully'})
+    
+
+
+
+
+
+
+# Patient VIEWS
+
+
+def patient_index(request):
+    return render(request, 'base/patient_index.html')
+
+
+
+
+def request_appointment(request):
+    if request.method == 'POST':
+        patient_id = request.POST.get('patient_id')
+        date = request.POST.get('date')
+        reason = request.POST.get('reason')
+
+        patient = Patient.objects.get(user=patient_id)
+
+        appointment = Appointment.objects.create(
+            patient = patient,
+            date = date,
+            reason = reason
+        )
+
+        appointment.save()
+
+        return JsonResponse({'message': 'Appointment requested successfully'})
+    
+
+def patient_appointment_in_progress(request, appointment_id):
+    
+    appoinment = Appointment.objects.get(id=appointment_id)
+
+    appoinment.status = 'In Progress'
+
+    appoinment.save()
+
+
+
+def send_appointment_reminders(request):
+
+
+    today = timezone.now().date()
+
+    appointments = Appointment.objects.filter(
+        date=today,
+        status__in=['Pending'],
+    )
+
+    for appointment in appointments:
+        patient = appointment.patient
+        email = patient.user.email  # Assuming email is stored in the User model
+
+        # Craft a clear and informative email message
+        subject = f"L-NU Infimary Appointment Reminder: {appointment.date}"
+        message = f"""
+        Dear {patient.user.first_name.capitalize()} {patient.user.last_name.capitalize()},
+
+        This is a friendly reminder that you have an appointment scheduled for today, {appointment.date}, at L-NU Infirmary.
+
+        We're happy to inform you that a doctor is now available to proceed with your appointment.
+
+        **Important Information:**
+
+        * Infirmary Hours: 9:00 AM - 4:00 PM
+        * Please bring any necessary medical records or documents with you.
+
+        If you need to reschedule your appointment, kindly contact us as soon as possible.
+
+        We look forward to seeing you soon!
+
+        Sincerely,
+
+        L-NU Infirmary Staff
+        """
+
+        # Send the email
+        try:
+            send_mail(
+                subject,
+                message,
+                'your_clinic_email@example.com', 
+                [email],
+                fail_silently=False,  
+            )
+        except Exception as e:
+            print(f"Error sending email to {email}: {e}")
+    
+    return JsonResponse({'message': 'Emails sent successfully'})
+
+def send_cancel_appointment_reminder(request):
+    today = timezone.now().date()
+
+    appointments = Appointment.objects.filter(
+        date=today,
+    )
+
+    for appointment in appointments:
+        patient = appointment.patient
+        email = patient.user.email  # Assuming email is stored in the User model
+        
+        # Update appointment status to 'Cancelled'
+        appointment.status = 'Cancelled'
+        appointment.save()  # Save the change to the database
+
+        # Craft a clear and informative email message
+        subject = f"L-NU Infirmary Appointment Cancellation: {appointment.date}"
+        message = f"""
+        Dear {patient.user.first_name.capitalize()} {patient.user.last_name.capitalize()},
+
+        We regret to inform you that your appointment scheduled for today, {appointment.date}, at L-NU Infirmary has been cancelled due to the doctor's unavailability.
+
+        We apologize for any inconvenience this may cause. If you need to reschedule your appointment or have any questions, please contact us at your earliest convenience.
+
+        **Contact Information:**
+
+        * Phone: (Your Clinic Phone Number)
+        * Email: your_clinic_email@example.com
+
+        Thank you for your understanding.
+
+        Sincerely,
+
+        L-NU Infirmary Staff
+        """
+
+        # Send the email
+        try:
+            send_mail(
+                subject,
+                message,
+                'your_clinic_email@example.com', 
+                [email],
+                fail_silently=False,  
+            )
+        except Exception as e:
+            print(f"Error sending email to {email}: {e}")
+    
+    return JsonResponse({'message': 'Emails sent successfully'})

@@ -25,14 +25,20 @@
   </title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
   <!-- Nucleo Icons -->
   <link href="/static/assets/css/nucleo-icons.css" rel="stylesheet" />
   <link href="/static/assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+
   <link href="/static/assets/css/nucleo-svg.css" rel="stylesheet" />
+  
   <!-- CSS Files -->
   <link id="pagestyle" href="/static/assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css' rel='stylesheet' />
 
   {% block stylesheet %}
 
@@ -45,7 +51,7 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg position-absolute top-0 z-index-3 w-100 shadow-none my-3 navbar-transparent mt-4">
     <div class="container">
-      <a class="navbar-brand font-weight-bolder ms-lg-0 ms-3 text-white" href="/static/pages/dashboard.html">
+      <a class="navbar-brand font-weight-bolder ms-lg-0 ms-3 text-white cursor-pointer">
         L-NU Infirmary
       </a>
       <button class="navbar-toggler shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,27 +65,46 @@
         <ul class="navbar-nav mx-auto">
 
           <li class="nav-item">
-            <a class="nav-link me-2" href="/static/pages/profile.html">
-              <i class="fa fa-user opacity-6  me-1"></i>
+            <a class="nav-link me-2" href="/">
+              <i class="fa fa-home opacity-6  me-1"></i>
               Home
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link me-2" href="{% url 'register-page' %}">
-              <i class="fas fa-user-circle opacity-6  me-1"></i>
-              Sign Up
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link me-2" href="{% url 'login-page' %}">
-              <i class="fas fa-key opacity-6  me-1"></i>
-              Sign In
-            </a>
-          </li>
+          {% if request.user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link me-2" href="{% url 'login-page' %}">
+                <i class="fas fa-user opacity-6  me-1"></i>
+                Profile
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link me-2" href="{% url 'register-page' %}">
+                <i class="fas fa-paper-plane opacity-6  me-1"></i>
+                Requests
+              </a>
+            </li>
+          {% else %}
+
+            <li class="nav-item">
+              <a class="nav-link me-2" href="{% url 'login-page' %}">
+                <i class="fas fa-user-plus opacity-6  me-1"></i>
+                Login
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link me-2" href="{% url 'register-page' %}">
+                <i class="fas fa-user-circle opacity-6  me-1"></i>
+                Register
+              </a>
+            </li>
+
+          {% endif %}
+
         </ul>
         <ul class="navbar-nav d-lg-block d-none">
           <li class="nav-item">
-            <a href="https://www.facebook.com/LNUdagupanofficial" class="btn btn-sm mb-0 me-1 bg-gradient-info">Follow us on Facebook</a>
+            <a href="https://www.facebook.com/LNUdagupanofficial" class="btn bg-gradient-info" target="_blank">
+              <i class="fa-brands fa-facebook"></i><span class="m-2">Follow us</span></a>
           </li>
         </ul>
       </div>
@@ -121,9 +146,13 @@
 
 
     </div>
+
+
   </main>
 
   <!-- -------- START FOOTER 3 w/ COMPANY DESCRIPTION WITH LINKS & SOCIAL ICONS & COPYRIGHT ------- -->
+   
+  
   <footer class="footer py-5">
     <div class="container">
       <div class="row">
@@ -170,20 +199,30 @@
           <p class="mb-0 text-secondary">
             Copyright © <script>
               document.write(new Date().getFullYear())
-            </script> Soft by Creative Tim.
+            </script> Lyceum-Northwestern University.
           </p>
         </div>
       </div>
     </div>
   </footer>
+
+
+
+
+
+
   <!-- -------- END FOOTER 3 w/ COMPANY DESCRIPTION WITH LINKS & SOCIAL ICONS & COPYRIGHT ------- -->
   <!--   Core JS Files   -->
+     
   {% include 'includes/scripts.html' %}
 
     {% block js %}
+    
 
 
     {% endblock %}
+
+
 </body>
 
 </html>
