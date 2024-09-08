@@ -6,4 +6,9 @@ from . models import *
 admin.site.register(ClinicConsultation)
 admin.site.register(BPMonitoring)
 admin.site.register(DentalCase)
+admin.site.register(AppointmentRequest)
 admin.site.register(Appointment)
+admin.site.register(MedicalCertificateRequest)
+
+admin.site.register(MedicalCertificate)
+

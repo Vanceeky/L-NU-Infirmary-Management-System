@@ -21,7 +21,7 @@
           <span class="btn-inner--text">Request Appointment</span>
           </a>
           
-          <a class="btn btn-outline-secondary btn-icon mb-3 mb-sm-0">
+          <a type="button" data-bs-toggle="modal" data-bs-target="#modal-medcert" class="btn btn-outline-secondary btn-icon mb-3 mb-sm-0">
               <span class="btn-inner--icon"><i class="fa-solid fa-notes-medical"></i></span>
               <span class="btn-inner--text">Request Medical Certificate</span>
           </a>
@@ -82,6 +82,102 @@
             </form>
 
             {% else %}
+
+            <form role="form" action="{% url 'login-user' %}" method="POST">
+              {% csrf_token %}
+              <div class="mb-3">
+                <input type="text" name="username" class="form-control" placeholder="User ID" aria-label="Name">
+              </div>
+              <div class="mb-3">
+                <input type="password" name="password" class="form-control" placeholder="Password" aria-label="Password">
+              </div>
+  
+              <div class="text-center">
+                <button type="submit" class="btn bg-gradient-dark w-100 my-4 mb-2">Login</button>
+              </div>
+              <p class="text-sm mt-3 mb-0">Don't have an account? <a href="{% url 'register-page' %}" class="text-dark font-weight-bolder">Sign up</a></p>
+            </form>
+
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-medcert" tabindex="-1" role="dialog" aria-labelledby="modal-form" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-body p-0">
+        <div class="card card-plain">
+          <div class="card-header pb-0 text-left">
+            {% if request.user.is_authenticated %}
+
+            <h3 class="font-weight-bolder text-secondary ">Request Medical Certificate</h3>
+            {% else %}
+
+            <h3 class="font-weight-bolder text-secondary ">Login Account</h3>
+            {% endif %}
+          </div>
+          <div class="card-body">
+
+
+            {% if request.user.is_authenticated %}
+              {% if records %}
+              <form role="form text-left" action="{% url 'request-medcert' %}" method="POST" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <input type="hidden" name="patient_id" value="{{ request.user.id }}">
+
+                <div class="form-group">
+                
+                  <label for="exampleFormControlSelect1">Please select from a list of recent visits or tests: </label>
+                  <select class="form-control"  name="patient_record" id="exampleFormControlSelect1">
+                    {% for record in records %}
+                    <option>{{ record }}</option>
+                    {% endfor %}
+                  </select>
+                  
+
+                </div>
+
+                <div class="form-group">
+                  <label for="example-text-input" class="form-control-label">Purpose of Medical Certificate: </label>
+                  <input class="form-control" type="text" name="purpose" required value="" id="example-text-input">
+                </div>
+
+
+                <div class="form-group">
+                  <label for="exampleFormControlTextarea1">Please state your reason: </label>
+                  <textarea class="form-control" name="reason" required id="exampleFormControlTextarea1" rows="1"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="exampleFormControlTextarea1">Additional Notes or Details: </label>
+                  <textarea class="form-control" name="additional_notes"  id="exampleFormControlTextarea1" rows="1"></textarea>
+                </div>
+
+                
+                <div class="form-group">
+                  <label for="example-text-input" class="form-control-label">Additional supporting documents: </label>
+                  <input class="form-control" type="file" name="supporting_document" value="" id="example-text-input">
+                </div>
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-round bg-gradient-secondary btn-lg w-100 mt-4 mb-0">Send request</button>
+                </div>
+              </form>
+              {% else %}
+
+              <p class="text-center"> No records found. Please schedule an appointment or visit the infirmary clinic between 9 AM and 4 PM to have your details entered into our system. </p>
+
+              {% endif %}
+
+            {% else %}
+            
 
             <form role="form" action="{% url 'login-user' %}" method="POST">
               {% csrf_token %}

@@ -1,0 +1,186 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %} Home {% endblock %}
+
+
+{% block stylesheet %}
+
+{% endblock %}
+
+
+{% block content%}
+
+<div class="row mt-lg-n10 mt-md-n11 mt-n10">
+    <div class="col-md-3 z-index-1  ">
+       <div class="section ">
+          <section class="z-index-1  text-center">
+             <div class="fileinput fileinput-new text-center" data-provides="fileinput">
+                    <div id="profile-pic-container" class="mb-3">
+                        <img id="profile-pic" src="{{ patient.avatar.url }}" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px;">
+                    </div>
+                    <div class="mb-3">
+                        <input type="file" id="file-input" class="d-none" accept="image/*">
+                        <button id="change-profile-btn" class="btn btn-sm btn-secondary">Change Profile</button>
+                        
+                    </div>
+
+             </div>
+             <h3 class="title mt-4 text-capitalize">{{ patient.user.first_name }} {{ patient.user.last_name }} </h3>
+          </section>
+
+       </div>
+    </div>
+    <div class="col-md-8 ml-auto z-index-2">
+       <div class="section ">
+       
+        <div class="card">
+            <div class="card-header pb-0">
+               <div class="d-flex justify-content-between align-items-center">
+                  <p class="mb-0">{{ patient.user_id_number }}</p>
+                    <div class="nav-wrapper position-relative end-0">
+                
+                        <ul class="nav" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#clinic_logs" role="tab">
+                                <i class="tim-icons icon-lock-circle"></i>
+                                Clinic Logs
+                                </a>
+                             </li>
+                             
+
+                            <hr class="line-primary">
+                            <li class="nav-item">
+                               <a class="nav-link" data-bs-toggle="tab" href="#account" role="tab">
+                               <i class="tim-icons icon-credit-card"></i>
+                               Account
+                               </a>
+                            </li>
+
+
+                         </ul>
+    
+                    </div>
+               </div>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane fade" id="account" role="tabpanel">
+
+                        <form action="" method="POST" enctype="multipart/form-data">
+                            <p class="text-uppercase text-sm">User Information</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="form-control-label">Username</label>
+                                        <input class="form-control" type="text" value="{{ request.user }}" onfocus="focused(this)" onfocusout="defocused(this)">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="form-control-label">Email address</label>
+                                        <input class="form-control" type="email" value="{{ patient.user.email }}" onfocus="focused(this)" onfocusout="defocused(this)">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                    <label for="example-text-input" class="form-control-label">Category</label>
+                                    <input class="form-control" type="text" readonly value="{{ patient.category }}" onfocus="focused(this)" onfocusout="defocused(this)">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                    <label for="example-text-input" class="form-control-label">Designation</label>
+                                    <input class="form-control" type="text" value="{{ patient.designation }}" onfocus="focused(this)" onfocusout="defocused(this)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="horizontal dark">
+
+                            <p class="text-uppercase text-sm">Contact Information</p>
+                            <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                        <label for="example-text-input" class="form-control-label">Contact Number</label>
+                                        <input class="form-control" type="text" value="{{ patient.contact_number }}" onfocus="focused(this)" onfocusout="defocused(this)">
+                                        </div>
+                                    </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="form-control-label">Address</label>
+                                        <input class="form-control" type="text" value="{{ patient.address }}" onfocus="focused(this)" onfocusout="defocused(this)">
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <button type="submit" class="d-flex align-items-end btn btn-outline-info">Save Changes</button>
+
+                        </form>
+
+                    </div>
+
+                    <div class="tab-pane fade" id="account" role="tabpanel">
+                        Account Content
+                    </div>
+
+                    <div class="tab-pane fade show active" id="clinic_logs" role="tabpanel">
+                        <div class="">
+                            <div class="">
+                                <p class="text-uppercase text-sm">Clinic Logs</p>
+                            </div>
+                            <div class="">
+                               <ul class="list-group">
+                                {% if combined_records %}
+                                
+                                    {% for record in combined_records %}
+                                        <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                                            <div class="d-flex flex-column">
+                                                <h6 class="mb-3 text-sm">{{ record.type }}</h6>
+                                                <span class="mb-2 text-xs">Datetime: <span class="text-dark font-weight-bold ms-sm-2">{{ record.date }}</span></span>
+                                                <span class="mb-2 text-xs">Details: <span class="text-dark ms-sm-2 font-weight-bold">{{ record.details }}</span></span>
+                                                <span class="text-xs">Remarks: <span class="text-dark ms-sm-2 font-weight-bold">{{ record.remarks }}</span></span>
+                                            </div>
+
+                                        </li>
+                                    {% endfor %}
+
+                                {% else %}
+                                    <p>No records found.</p>
+                                {% endif %}
+                               </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+            </div>
+         </div>
+       </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+    document.getElementById('change-profile-btn').addEventListener('click', function() {
+        document.getElementById('file-input').click();
+    });
+
+    document.getElementById('file-input').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profile-pic').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+{% endblock %}

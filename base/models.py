@@ -36,7 +36,7 @@ class DentalCase(models.Model):
     
 
 
-class Appointment(models.Model):
+class AppointmentRequest(models.Model):
 
     status_choices = [
 
@@ -60,3 +60,51 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"{self.date} - {self.patient} - {self.reason} - {self.status}"
+    
+
+class Appointment(models.Model):
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    purpose = models.TextField()
+    remarks = models.TextField(null=True, blank=True)
+
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.date_created} - {self.patient} - {self.purpose}"
+
+    
+
+class MedicalCertificateRequest(models.Model):
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+
+    patient_record = models.CharField(max_length=100)
+    purpose = models.CharField(max_length=100)
+    reason = models.TextField()
+    additional_notes = models.TextField(null=True, blank=True)
+    additional_file = models.FileField(null=True, blank=True)
+
+    status = models.CharField(max_length=12, choices=[('Pending', 'Pending'), ('Issued', 'Issued'), ('Denied', 'Denied')], default='Pending')
+
+
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.date_created} - {self.patient} - {self.purpose} - {self.status}"
+    
+
+class MedicalCertificate(models.Model):
+    
+    request_id = models.ForeignKey(MedicalCertificateRequest, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    purpose = models.CharField(max_length=100)
+
+    date_created = models.DateTimeField(auto_now_add=True)
+
+
+    status = models.CharField(max_length=12, choices=[('Pending', 'Pending'), ('Received', 'Received')], default='Pending')
+
+
+    def __str__(self):
+        return f"{self.date_created} - {self.patient} - {self.purpose} - {self.status}"

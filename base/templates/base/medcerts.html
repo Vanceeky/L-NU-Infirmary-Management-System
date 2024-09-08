@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+
+{% block title %} Medical Certificates {% endblock %}
+
+
+{% block css %}
+
+
+{% endblock %}
+
+{% block content %}
+
+
+<div class="row">
+
+    <div class="col-lg-8 mb-lg-0 mb-4">
+        <div class="card ">
+          <div class="card-header pb-0 p-3">
+            <div class="d-flex justify-content-between">
+              <h6 class="mb-2">Medical Certificates</h6>
+ 
+              <button class="btn bg-gradient-info" data-bs-toggle="modal" data-bs-target="#modal-add-patient"><i class="fa fa-plus mx-2"></i>Add New Patient</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-center text-secondary text-xs font-weight-bolder opacity-7">ID</th>
+                  
+                  <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Patient</th>
+                  <th class="text-uppercase text-center text-secondary text-xs font-weight-bolder opacity-7">Category</th>
+                  
+                  <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Purpose</th>
+                  
+                  <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Date Issued</th>
+                  <th class="text-secondary opacity-7"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="text-center">
+                    <a href=""><span class="text-secondary text-sm font-weight-bold">1</span></a>
+                  </td>
+
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div>
+                        <img src="/static/assets/img/team-2.jpg" class="avatar avatar-md me-3" alt="user1">
+                      </div>
+                      <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-md"><a href="{% url 'patient-profile-dashboard' %}">John Michael</a></h6>
+                        <p class="text-sm text-secondary mb-0">Male ( 22 )</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <p class="text-sm font-weight-bold mb-0">Student</p>
+                    <p class="text-sm text-secondary mb-0">BSIT</p>
+                  </td>
+                  <td class="text-center">
+                    <p class="text-sm font-weight-bold mb-0">Medical Report</p>
+                  </td>
+                  <td class=" text-center">
+                    <span class="text-secondary text-sm font-weight-bold">July 29, 2024 </span>
+                    
+                    <p class="text-sm text-secondary mb-0">11:30pm</p>
+                  </td>
+
+                  <td class="align-middle text-center text-sm">
+                    <span class="font-weight-bold text-secondary"><button class="btn btn-link text-dark text-sm mb-0 px-0 ms-4"><i class="fa fa-print text-lg me-1" aria-hidden="true"></i> Print</button></span>
+                  </td>
+
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+       <div class="card">
+          <div class="card-header pb-0 px-3">
+             <h6 class="mb-0">Requests</h6>
+          </div>
+          <div class="card-body pt-4 p-3">
+             <ul class="list-group">
+                <li class="list-group-item border-0 p-4 mb-2 bg-gray-100 border-radius-lg">
+                   <div class="d-flex justify-content-between align-items-center">
+
+                    <h6 class="text-sm">Oliver Liam</h6>
+                    <h6 class="text-sm text-muted"><i class="fa-solid fa-calendar-days mx-2"></i></i>September 2, 2024</h6>
+
+                   </div>
+                   <hr class="dark horizontal">
+                   <div class="d-flex flex-column">
+
+                      <span class="mb-2 text-xs">Patient Record: <span class="text-dark font-weight-bold ms-sm-2">9/25/2024: Lab Test</span></span>
+                      <span class="mb-2 text-xs">Purpose: <span class="text-dark ms-sm-2 font-weight-bold">asdasdaskldhkj alsdhkjahsd askdhaksdh</span></span>
+                      <span class="text-xs">Reason: <span class="text-dark ms-sm-2 font-weight-bold">FRB1235476</span></span>
+                      
+
+                   </div>
+
+                </li>
+
+             </ul>
+          </div>
+       </div>
+    </div>
+
+
+</div>
+
+{% endblock %}
+
+
+{% block js%}
+
+{% endblock %}

@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.http import Http404
 from . models import *
 from django.utils import timezone
 from django.http import JsonResponse
@@ -7,15 +8,163 @@ from django.core.mail import send_mail
 from django.utils import timezone
 from datetime import timedelta
 # Create your views here.
+import calendar
+from django.db.models import Count
+from django.db.models.functions import ExtractMonth
 
+def monthly_model_counts(request):
+    # Define a function to get counts per month for a given model
+    def get_monthly_counts(model):
+        return (
+            model.objects
+            .annotate(month=ExtractMonth('date_created'))
+            .values('month')
+            .annotate(count=Count('id'))
+            .order_by('month')
+        )
 
+    # Get counts for each model
+    medical_certificates = get_monthly_counts(MedicalCertificate)
+    appointments = get_monthly_counts(Appointment)
+    clinic_consultations = get_monthly_counts(ClinicConsultation)
+    bp_monitorings = get_monthly_counts(BPMonitoring)
+    dental_cases = get_monthly_counts(DentalCase)
+
+    # Prepare data for the chart
+    months = [calendar.month_name[i] for i in range(1, 13)]
+    
+    def fill_counts(counts):
+        return [0] * 12
+
+    def update_counts(counts, data):
+        for entry in data:
+            month = entry['month'] - 1
+            counts[month] = entry['count']
+
+    data = {
+        'months': months,
+        'medical_certificates': fill_counts([0] * 12),
+        'appointments': fill_counts([0] * 12),
+        'clinic_consultations': fill_counts([0] * 12),
+        'bp_monitorings': fill_counts([0] * 12),
+        'dental_cases': fill_counts([0] * 12)
+    }
+
+    update_counts(data['medical_certificates'], medical_certificates)
+    update_counts(data['appointments'], appointments)
+    update_counts(data['clinic_consultations'], clinic_consultations)
+    update_counts(data['bp_monitorings'], bp_monitorings)
+    update_counts(data['dental_cases'], dental_cases)
+
+    return JsonResponse(data)
+
+def model_counts(request):
+    counts = {
+        'Medical Certificates': MedicalCertificate.objects.count(),
+        'Appointments': Appointment.objects.count(),
+        'Clinic Consultations': ClinicConsultation.objects.count(),
+        'BP Monitoring': BPMonitoring.objects.count(),
+        'Dental Cases': DentalCase.objects.count(),
+    }
+    return JsonResponse(counts)
 
 def index(request):
-    return render(request, 'base/index.html')
+    # Initialize patient and records variables
+    patient = None
+    records = None
+
+    # Check if the user is authenticated
+    if request.user.is_authenticated:
+        # Attempt to get the patient record for the logged-in user
+        patient = Patient.objects.filter(user=request.user).first()
+
+        if patient:
+            # Get the patient records if the patient exists
+            records = get_patient_records(patient.id)
+
+    context = {
+        'patient': patient,
+        'records': records
+    }
+    return render(request, 'base/index.html', context)
+
+
+def get_patient_records(patient_id):
+    patient = get_object_or_404(Patient, id=patient_id)
+    records = []
+
+    # Fetch and format Clinic Consultations
+    consultations = ClinicConsultation.objects.filter(patient=patient).order_by('-date_created')
+    for consultation in consultations:
+        records.append(f"{consultation.date_created.strftime('%B %d, %Y')}: Clinic Consultation")
+
+    # Fetch and format BP Monitoring
+    bp_monitorings = BPMonitoring.objects.filter(patient=patient).order_by('-date_created')
+    for bp in bp_monitorings:
+        records.append(f"{bp.date_created.strftime('%B %d, %Y')}: BP Monitoring")
+
+    # Fetch and format Dental Cases
+    dental_cases = DentalCase.objects.filter(patient=patient).order_by('-date_created')
+    for case in dental_cases:
+        records.append(f"{case.date_created.strftime('%B %d, %Y')}: Dental Case")
+
+    return records
+
+
+def request_medcert(request):
+
+    patient = get_object_or_404(Patient, user=request.user)
+    if request.method == 'POST':
+
+        patient_record = request.POST.get('patient_record')
+        purpose = request.POST.get('purpose')
+        reason = request.POST.get('reason')
+
+
+        additional_notes = request.POST.get('additional_notes')
+        additional_file = request.FILES.get('supporting_document')
+
+
+        MedicalCertificateRequest.objects.create(
+            patient = patient,
+            patient_record = patient_record,
+            purpose = purpose,
+            reason = reason,
+            additional_notes = additional_notes,
+            additional_file = additional_file
+        )
+
+        return JsonResponse({'message': 'Request submitted successfully'})
+
+
 
 
 def dashboard(request):
-    return render(request, 'base/dashboard.html')
+    patients = Patient.objects.all()
+    appointment_requests = AppointmentRequest.objects.all()
+    medicial_certificate_requests = MedicalCertificateRequest.objects.all()
+
+    students = patients.filter(category = 'Student')
+    employees = patients.filter(category = 'Employee')
+
+    appointment_completed = appointment_requests.filter(status = 'Completed')
+    appointment_pending = appointment_requests.filter(status = 'Pending')
+
+    med_cert_pending = medicial_certificate_requests.filter(status = 'Pending')
+    med_cert_issued = medicial_certificate_requests.filter(status = 'Issued')
+
+
+    context = {
+        'students': students,
+        'employees': employees,
+
+        'appointment_completed': appointment_completed,
+        'appointment_pending': appointment_pending,
+
+        'med_cert_pending': med_cert_pending,
+        'med_cert_issued': med_cert_issued
+    }
+    return render(request, 'base/dashboard.html', context)
 
 
    # return render(request, 'patient_search.html')
@@ -50,7 +199,7 @@ def daily_logs(request):
 
 def appointments(request):
     # Get all appointments for today
-    appointments = Appointment.objects.filter(date=timezone.now())
+    appointments = AppointmentRequest.objects.filter(date=timezone.now())
 
     # Filter appointments to get those with statuses 'In Queue' and 'In Progress'
     in_queue_appointments = appointments.filter(status='In Queue')
@@ -78,14 +227,18 @@ def patients(request):
     return render(request, 'base/patients.html')
 
 
-def patient_profile(request):
-    return render(request, 'base/patient_profile.html')
 
 def inventory(request):
     return render(request, 'base/inventory.html')
 
 
 
+def medcerts(request):
+    medcerts = MedicalCertificateRequest.objects.all()
+    context = {
+        'medcerts': medcerts
+    }
+    return render(request, 'base/medcerts.html', context)
 
 
 
@@ -187,11 +340,90 @@ def add_dental_case(request):
 
 # Patient VIEWS
 
+def view_patient_dashboard(request):
+    return render(request, 'base/patient_profile.html')
 
 def patient_index(request):
     return render(request, 'base/patient_index.html')
 
 
+def patient_profile(request, patient_id):
+    try:
+        # Fetch the patient object for the logged-in user
+        patient = Patient.objects.get(id=patient_id, user=request.user)
+    except Patient.DoesNotExist:
+        raise Http404("Patient not found")
+
+    clinic_consultation = ClinicConsultation.objects.filter(patient=patient).order_by('-date_created')
+    bp_monitoring = BPMonitoring.objects.filter(patient=patient).order_by('-date_created')
+    dental_case = DentalCase.objects.filter(patient=patient).order_by('-date_created')
+
+    certificate_requests = MedicalCertificateRequest.objects.filter(patient=patient).order_by('-date_created')
+    certificates = MedicalCertificate.objects.filter(patient=patient).order_by('-date_created')
+    appointment_requests = AppointmentRequest.objects.filter(patient=patient).order_by('-date_created')
+
+    combined_records = []
+
+    for consultation in clinic_consultation:
+        combined_records.append({
+            'type': 'Clinic Consultation',
+            'date': consultation.date_created,
+            'details': consultation.chief_complaint,
+            'remarks': consultation.remarks
+        })
+
+    for bp in bp_monitoring:
+        combined_records.append({
+            'type': 'BP Monitoring',
+            'date': bp.date_created,
+            'details': f"Systolic / Diastolic: {bp.systolic} / {bp.diastolic}, Heart Rate: {bp.heart_rate}",
+            'remarks': bp.remarks
+        })
+
+    for case_ in dental_case:
+        combined_records.append({
+            'type': 'Dental Case',
+            'date': case_.date_created,
+            'details': f"Treatment Needed: {case_.treatment_needed}",
+            'remarks': case_.remarks
+        })
+
+    for request_ in certificate_requests:
+
+        combined_records.append({
+            'type': 'Medical Certificate Request',
+            'date': request_.date_created,
+            'details': f"Purpose: {request_.purpose}, Reason: {request_.reason}",
+            'remarks': request_.status
+        })
+
+    for certificate in certificates:
+        combined_records.append({
+            'type': 'Medical Certificate',
+            'date': certificate.date_created,
+            'details': f"Purpose: {certificate.purpose}",
+            'remarks': certificate.status,
+        })
+
+    for request_ in appointment_requests:
+        combined_records.append({
+            'type': 'Appointment Request',
+            'date': request_.date_created,
+            'details': f"Date requested: {request_.date}, Reason: {request_.reason}",
+            'remarks': request_.status
+        })
+
+
+
+    # Sort the combined records by date
+    combined_records.sort(key=lambda x: x['date'], reverse=True)
+
+    context = {
+        'patient': patient,
+        'combined_records': combined_records
+    }
+
+    return render(request, 'base/patient/profile.html', context)
 
 
 def request_appointment(request):
@@ -202,7 +434,7 @@ def request_appointment(request):
 
         patient = Patient.objects.get(user=patient_id)
 
-        appointment = Appointment.objects.create(
+        appointment = AppointmentRequest.objects.create(
             patient = patient,
             date = date,
             reason = reason
@@ -215,7 +447,7 @@ def request_appointment(request):
 
 def patient_appointment_in_progress(request, appointment_id):
     
-    appoinment = Appointment.objects.get(id=appointment_id)
+    appoinment = AppointmentRequest.objects.get(id=appointment_id)
 
     appoinment.status = 'In Progress'
 
@@ -228,7 +460,7 @@ def send_appointment_reminders(request):
 
     today = timezone.now().date()
 
-    appointments = Appointment.objects.filter(
+    appointments = AppointmentRequest.objects.filter(
         date=today,
         status__in=['Pending'],
     )
@@ -277,7 +509,7 @@ def send_appointment_reminders(request):
 def send_cancel_appointment_reminder(request):
     today = timezone.now().date()
 
-    appointments = Appointment.objects.filter(
+    appointments = AppointmentRequest.objects.filter(
         date=today,
     )
 
