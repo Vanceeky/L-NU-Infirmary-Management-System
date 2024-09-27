@@ -60,7 +60,7 @@
 
 
             {% if request.user.is_authenticated %}
-            <form role="form text-left" action="{% url 'request-appointment' %}" method="POST">
+            <form role="form text-left" id="request-appointment-form" action="{% url 'request-appointment' %}" method="POST">
 
               {% csrf_token %}
 
@@ -83,8 +83,11 @@
 
             {% else %}
 
-            <form role="form" action="{% url 'login-user' %}" method="POST">
+
+            <form role="form" action="{% url 'combined-login' %}" method="POST">
               {% csrf_token %}
+              
+            <input type="hidden" name="user_type" value="patient">
               <div class="mb-3">
                 <input type="text" name="username" class="form-control" placeholder="User ID" aria-label="Name">
               </div>
@@ -126,23 +129,13 @@
 
             {% if request.user.is_authenticated %}
               {% if records %}
+
               <form role="form text-left" action="{% url 'request-medcert' %}" method="POST" enctype="multipart/form-data">
 
                 {% csrf_token %}
 
                 <input type="hidden" name="patient_id" value="{{ request.user.id }}">
 
-                <div class="form-group">
-                
-                  <label for="exampleFormControlSelect1">Please select from a list of recent visits or tests: </label>
-                  <select class="form-control"  name="patient_record" id="exampleFormControlSelect1">
-                    {% for record in records %}
-                    <option>{{ record }}</option>
-                    {% endfor %}
-                  </select>
-                  
-
-                </div>
 
                 <div class="form-group">
                   <label for="example-text-input" class="form-control-label">Purpose of Medical Certificate: </label>
@@ -170,6 +163,7 @@
                   <button type="submit" class="btn btn-round bg-gradient-secondary btn-lg w-100 mt-4 mb-0">Send request</button>
                 </div>
               </form>
+              
               {% else %}
 
               <p class="text-center"> No records found. Please schedule an appointment or visit the infirmary clinic between 9 AM and 4 PM to have your details entered into our system. </p>
@@ -179,8 +173,10 @@
             {% else %}
             
 
-            <form role="form" action="{% url 'login-user' %}" method="POST">
+            <form role="form" action="{% url 'combined-login' %}" method="POST">
               {% csrf_token %}
+              
+              <input type="hidden" name="user_type" value="patient">
               <div class="mb-3">
                 <input type="text" name="username" class="form-control" placeholder="User ID" aria-label="Name">
               </div>
@@ -241,7 +237,72 @@
   // Run the function when the DOM is fully loaded
   document.addEventListener('DOMContentLoaded', disablePastDatesAndSundays);
 </script>
+<!-- Include SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
-
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('request-appointment-form');
+  
+      form.addEventListener('submit', function(event) {
+          event.preventDefault();  // Prevent the default form submission
+  
+          const formData = new FormData(form);
+  
+          Swal.fire({
+              title: 'Sending...',
+              text: 'Your request is being processed',
+              icon: 'info',
+              showConfirmButton: false,
+              allowOutsideClick: false,
+              didOpen: () => {
+                  Swal.showLoading();
+              }
+          });
+  
+          fetch('{% url "request-appointment" %}', {
+              method: 'POST',
+              body: formData,
+              headers: {
+                  'X-CSRFToken': formData.get('csrfmiddlewaretoken')  // Pass CSRF token
+              }
+          })
+          .then(response => response.json())
+          .then(data => {
+              Swal.close();  // Close the loading alert
+  
+              if (data.message === 'Appointment requested successfully') {
+                  Swal.fire({
+                      icon: 'success',
+                      
+                      title: 'Success',
+                      text: data.message,
+                      timer: 2000,  // Auto-close after 2 seconds
+                      timerProgressBar: true,
+                      showConfirmButton: false,
+                      didClose: () => {
+                          window.location.reload();  // Reload the page after closing
+                      }
+                  });
+              } else {
+                  Swal.fire({
+                      icon: 'info',
+                      text: data.message,
+                  });
+              }
+          })
+          .catch(error => {
+              Swal.close();  // Close the loading alert
+  
+              Swal.fire({
+                  icon: 'info',
+                  title: 'Error',
+                  text: 'An unexpected error occurred.',
+                  timer: 2000,  // Auto-close after 2 seconds
+                  timerProgressBar: true
+              });
+          });
+      });
+  });
+  </script>
 {% endblock %}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/assets/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="/static/assets/img/favicon.png">
+  <title>
+    {% block title %} {% endblock %} | L-NU Infirmary
+  </title>
+  <!--     Fonts and icons     -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+
+
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/static/assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+
+
+  
+  
+
+  
+  
+  <style>
+
+    body {
+       font-family: 'Times New Roman', Times, serif;
+
+    }
+    .tab-space {
+        display: inline-block;
+        width: 60px; /* Adjust for desired tab size */
+    }
+
+    #qr_code img {
+        border: 2px solid red;
+
+    }
+  </style>
+</head>
+
+
+<body>
+
+
+
+        <div class=" container">
+            <div class="card-header">
+                <div class="d-flex px-2 py-1 justify-content-center align-items-center">
+                    <div>
+                    <img src="/static/assets/img/L-NU_LOGO.png" class="avatar avatar-xl me-3">
+                    </div>
+                    <div class="d-flex mt-0 flex-column ">
+                        <h4 class="mb-0 text-center">LYCEUM-NORTHWESTERN UNIVERSITY</h4>
+                        <p class="text-md text-center text-secondary mb-0">Tapuac District, Dagupan City, Pangasinan</p>
+                  
+                     
+                    </div>
+
+                </div>
+
+                <hr class="dark horizontal">
+            </div>
+
+            <div class="card-body text">
+                <div class="text-center">
+                    <h3 class="text-uppercase">Infirmary </h3>
+                    <h4 class="mb-0 text-center">MEDICAL CERTIFICATE</h4>
+                </div>
+
+                <p class="text-end mt-5">Date: <span class="font-weight-bold">{{ cert.date_created|date }}</span></p>
+                <div class="mt-4">
+                    <p class="text-lg">To Whom It May Concern: </p>
+                    <p class="text-lg"><span class="tab-space"></span>This is to clarify that Mr/Ms.<span class="text-decoration-underline text-capitalize">{{ cert.patient.user.first_name }} {{ cert.patient.user.last_name}}</span>, <span class="text-decoration-underline"> {{ cert.patient.age}}</span>  years old, <span class="text-decoration-underline">{{ cert.patient.designation}}</span> <span class="text-decoration-underline">{{ cert.patient.category }}</span> of this institution and a resident of <span class="text-decoration-underline">ADDRESS</span> was seen and physically examined by the undersigned in this clinic with the following finding/s: </p>
+                </div>
+
+                <div class='mt-4'>
+                    <p class="text-lg font-weight-bold mt-5">Remarks: <span class="fw-normal">{{ cert.remarks }}</span></p>
+                </div>
+
+                <p class="text-lg"><span class="tab-space"></span>This is issued upon the request of Mr/Ms. <span class="text-capitalize text-decoration-underline">{{ cert.patient.user.first_name }} {{ cert.patient.user.last_name}}</span> for whatever purpose it may serve except for medico-legal intent. </p>
+
+                <div class="text-end mt-5" id="qr_code">
+                    <img src="{{ cert.qr_code.url }}" class="" style="width: 150px">
+                    <p class="text-danger"> Not valid without qrcode </p>
+                </div>
+
+
+            </div>
+
+            <div class="card-footer">
+
+
+                <div class="d-print-none mt-4">
+                    <div class="float-end">
+                        <a href="javascript:window.print()" class="btn btn-success me-1"><i class="fa fa-print"></i>Print</a>
+                        <a href="#" class="btn btn-primary w-md">Save</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+</body>
+
+
+<script>
+
+</script>

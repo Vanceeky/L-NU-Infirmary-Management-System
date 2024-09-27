@@ -1,6 +1,6 @@
 {% extends 'authentication/base.html' %}
 
-{% block title %} Login Account {% endblock %}
+{% block title %} Staff Login Account {% endblock %}
 
 
 {% block stylesheet %}
@@ -14,10 +14,10 @@
 <div class="row mt-lg-n10 mt-md-n11 mt-n10 justify-content-center">
     <div class="col-xl-4 col-lg-5 col-md-7 mx-auto">
       <div class="card z-index-0">
-        <div class="card-header text-center mb-0">
-          
+        <div class="card-header text-center pt-4">
+            
           <img src="/static/assets/img/L-NU_LOGO.png" style="width: 100px;" class="img-fluid">
-          <h5>L-NU Infirmary Patient Access</h5>
+          <h5>L-NU Infirmary Staff Access </h5>
           <p>User Authentication</p>
           
           {% if messages%}
@@ -31,7 +31,7 @@
         <div class="card-body">
           <form role="form" action="{% url 'combined-login' %}" method="POST">
             {% csrf_token %}
-            <input type="hidden" name="user_type" value="patient">
+            <input type="hidden" name="user_type" value="staff">
             <div class="mb-3">
               <input type="text" name="username" class="form-control" placeholder="User ID" aria-label="Name">
             </div>
@@ -42,12 +42,14 @@
             <div class="text-center">
               <button type="submit" class="btn bg-gradient-dark w-100 my-4 mb-2">Login</button>
             </div>
-            <p class="text-sm mt-3 mb-0">Don't have an account? <a href="{% url 'register-page' %}" class="text-dark font-weight-bolder">Sign up</a></p>
           </form>
         </div>
       </div>
     </div>
 </div>
+
+
+
 
 
 

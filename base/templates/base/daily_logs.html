@@ -22,38 +22,42 @@
             <div class="col-lg-8 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
               <div class="nav-wrapper position-relative end-0">
 
-                  <ul class="nav nav-pills nav-fill p-1" role="tablist">
-                      <li class="nav-item">
-                          <a class="nav-link mb-0 px-0 py-1 active d-flex align-items-center justify-content-center" data-bs-toggle="tab" href="#cc" role="tab" aria-selected="true">
-                              <i class="ni ni-app"></i>
-                              <span class="ms-2">Clinic Consultation</span>
-                          </a>
-                      </li>
-                      <li class="nav-item">
-                          <a class="nav-link mb-0 px-0 py-1 d-flex align-items-center justify-content-center" data-bs-toggle="tab" href="#bp" role="tab" aria-selected="false">
-                              <i class="ni ni-email-83"></i>
-                              <span class="ms-2">BP Monitoring</span>
-                          </a>
-                      </li>
+                <ul class="nav" role="tablist">
+                  <li class="nav-item">
+                      <a class="nav-link active" data-bs-toggle="tab" href="#cc" role="tab">
+                      <i class="tim-icons icon-lock-circle"></i>
+                      Clinic Consultation
+                      </a>
+                   </li>
+                   
+
+                  <hr class="line-primary">
+                  <li class="nav-item">
+                     <a class="nav-link" data-bs-toggle="tab" href="#bp" role="tab">
+                     <i class="tim-icons icon-credit-card"></i>
+                     BP Monitoring
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#dc" role="tab">
+                    <i class="tim-icons icon-lock-circle"></i>
+                    Dental Case
+                    </a>
+                 </li>
+                  
+
+                  <hr class="line-primary">
+                  <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#vac" role="tab">
+                    <i class="tim-icons icon-credit-card"></i>
+                    Vaccination
+                    </a>
+                  </li>
 
 
-                      <li class="nav-item">
-                        <a class="nav-link mb-0 px-0 py-1 d-flex align-items-center justify-content-center" data-bs-toggle="tab" href="#dc" role="tab" aria-selected="false">
-                            <i class="fa fa-paper-plane"></i>
-                            <span class="ms-2">Dental Case</span>
-                        </a>
-                      </li>
+               </ul>
 
-                      <!--
-                      <li class="nav-item">
-                        <a class="nav-link mb-0 px-0 py-1 d-flex align-items-center justify-content-center" data-bs-toggle="tab" href="#vac" role="tab" aria-selected="false">
-                            <i class="fa fa-paper-plane"></i>
-                            <span class="ms-2">Vaccination</span>
-                        </a>
-                      </li>
-                    -->
 
-                  </ul>
 
               </div>
           </div>
@@ -61,7 +65,6 @@
 
               <button class="btn bg-gradient-info btn-sm" data-bs-toggle="modal" data-bs-target="#add_cc"><i class="fa fa-plus-circle fa-5x mx-1"></i>Add New</button>
                 
-             
 
             </div>
 
@@ -75,16 +78,12 @@
             
 
               <div class="tab-pane fade show active" id="cc" role="tabpanel">
-                <div class="d-flex justify-content-between align-items-center mt-3">
-
-                  <h4 class="">Clinic Consultation Content</h4>
-                </div>
 
 
 
                 {% if clinic_consultation %}
                   <div class="table-responsive">
-                    <table class="table align-items-center mb-0">
+                    <table class="table align-items-center mb-0" id="cc_table">
                       <thead>
                         <tr>
                           <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
@@ -112,7 +111,7 @@
                                 <img src="{{ cc.patient.avatar.url }}" class="avatar avatar-sm me-3" alt="user1">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm text-capitalize">{{ cc.patient.user.first_name}} {{ cc.patient.user.last_name}} ({{ cc.patient.gender}}, {{ cc.patient.age}})</h6>
+                                <h6 class="mb-0 text-sm text-capitalize"><a href="{% url 'patient-profile-dashboard' cc.patient.user_id_number %}">{{ cc.patient.user.first_name}} {{ cc.patient.user.last_name}} ({{ cc.patient.gender}}, {{ cc.patient.age}})</a></h6>
                                 <p class="text-xs text-secondary mb-0">{{ cc.patient.user.email}}</p>
                               </div>
                             </div>
@@ -150,15 +149,11 @@
 
               <div class="tab-pane fade" id="bp" role="tabpanel">
                 
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                <h4 class="mt-3">BP Monitoring Content</h4>
-                
-                </div>
 
 
                 {% if BPMonitoring %}
                   <div class="table-responsive">
-                    <table class="table align-items-center mb-0">
+                    <table class="table align-items-center mb-0" id="bp_table">
                       <thead>
                         <tr>
                           <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
@@ -228,13 +223,10 @@
               </div>
 
               <div class="tab-pane fade" id="dc" role="tabpanel">
-                  <div class="d-flex justify-content-between align-items-center mt-3">
-                    <h4 class="mt-3">Dental Case logs</h4>
-                    
-                  </div>
+
                 {% if dental_case %}
                   <div class="table-responsive">
-                    <table class="table align-items-center mb-0">
+                    <table class="table align-items-center mb-0" id="dc_table">
                       <thead>
                         <tr>
                           <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
@@ -297,15 +289,79 @@
                   <p>This is the content for the CC tab. Place the settings options or configurations here.</p>
 
                 {% endif %}
+
               </div>
 
 
-                <!--
+               
               <div class="tab-pane fade" id="vac" role="tabpanel">
-                <h4 class="mt-3">Vaccination Content</h4>
-                <p>This is the content for the CC tab. Place the settings options or configurations here.</p>
+                {% if vaccination %}
+                  <div class="table-responsive">
+                    <table class="table align-items-center mb-0" id="vac_table">
+                      <thead>
+                        <tr>
+                          <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                          <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Patient</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Category</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Vaccine Name </th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Dose</th>
+                    
+                          <th class="text-secondary opacity-7"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        
+                        {% for vac in vaccination %}
+                        <tr>
+                          <td class="text-center">
+                            <span class="text-secondary text-xs font-weight-bold">{{ vac.id }}</span>
+                          </td>
+                          <td class=" text-center">
+                            <span class="text-secondary text-xs font-weight-bold">{{ vac.date_created | date}} - {{ vac.date_created | time}} </span>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="{{ vac.patient.avatar.url }}" class="avatar avatar-sm me-3" alt="user1">
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm text-capitalize">{{ vac.patient.user.first_name}} {{ vac.patient.user.last_name}} ({{ vac.patient.gender}}, {{ vac.patient.age}})</h6>
+                                <p class="text-xs text-secondary mb-0">{{ vac.patient.user.email}}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="text-center">
+                            <p class="text-xs font-weight-bold mb-0">{{ vac.patient.category}}</p>
+                            <p class="text-xs text-secondary mb-0">{{ vac.patient.designation}}</p>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="">{{ vac.vaccine_name }}</span>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="">{{ vac.dose }}</span>
+                          </td>
+                          <td class="align-middle">
+                            <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip"
+                              data-original-title="View user">
+                              View
+                            </a>
+                          </td>
+                        </tr>
+                        {% endfor %}
+
+
+                      </tbody>
+                    </table>
+                  </div>
+                  {% else %}
+
+                        
+                  <p>This is the content for the CC tab. Place the settings options or configurations here.</p>
+
+                {% endif %}
               </div>
-              -->
+              
 
           </div>
 
@@ -379,6 +435,7 @@
                        <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
                     </div>
                   </li>
+
                   <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                     <div class="d-flex align-items-center">
                        <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
@@ -401,6 +458,35 @@
                        <div class="d-flex flex-column">
                           <h6 class="mb-1 text-dark text-sm">Dental Cases</h6>
                           <span class="text-xs">{{ dental_patients_today.count }} Dental Patients Today, <span class="font-weight-bold">{{ dental_case.count }} Total Patient Records</span></span>
+                       </div>
+                    </div>
+                    <div class="d-flex">
+                       <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
+                    </div>
+                  </li>
+
+                  <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                    <div class="d-flex align-items-center">
+                       <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
+                          <svg width="12px" height="12px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="mt-1">
+                             <title>spaceship</title>
+                             <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                <g transform="translate(-1720.000000, -592.000000)" fill="#FFFFFF" fill-rule="nonzero">
+                                   <g transform="translate(1716.000000, 291.000000)">
+                                      <g transform="translate(4.000000, 301.000000)">
+                                         <path d="M39.3,0.706666667 C38.9660984,0.370464027 38.5048767,0.192278529 38.0316667,0.216666667 C14.6516667,1.43666667 6.015,22.2633333 5.93166667,22.4733333 C5.68236407,23.0926189 5.82664679,23.8009159 6.29833333,24.2733333 L15.7266667,33.7016667 C16.2013871,34.1756798 16.9140329,34.3188658 17.535,34.065 C17.7433333,33.98 38.4583333,25.2466667 39.7816667,1.97666667 C39.8087196,1.50414529 39.6335979,1.04240574 39.3,0.706666667 Z M25.69,19.0233333 C24.7367525,19.9768687 23.3029475,20.2622391 22.0572426,19.7463614 C20.8115377,19.2304837 19.9992882,18.0149658 19.9992882,16.6666667 C19.9992882,15.3183676 20.8115377,14.1028496 22.0572426,13.5869719 C23.3029475,13.0710943 24.7367525,13.3564646 25.69,14.31 C26.9912731,15.6116662 26.9912731,17.7216672 25.69,19.0233333 L25.69,19.0233333 Z"></path>
+                                         <path d="M1.855,31.4066667 C3.05106558,30.2024182 4.79973884,29.7296005 6.43969145,30.1670277 C8.07964407,30.6044549 9.36054508,31.8853559 9.7979723,33.5253085 C10.2353995,35.1652612 9.76258177,36.9139344 8.55833333,38.11 C6.70666667,39.9616667 0,40 0,40 C0,40 0,33.2566667 1.855,31.4066667 Z"></path>
+                                         <path d="M17.2616667,3.90166667 C12.4943643,3.07192755 7.62174065,4.61673894 4.20333333,8.04166667 C3.31200265,8.94126033 2.53706177,9.94913142 1.89666667,11.0416667 C1.5109569,11.6966059 1.61721591,12.5295394 2.155,13.0666667 L5.47,16.3833333 C8.55036617,11.4946947 12.5559074,7.25476565 17.2616667,3.90166667 L17.2616667,3.90166667 Z" opacity="0.598539807"></path>
+                                         <path d="M36.0983333,22.7383333 C36.9280725,27.5056357 35.3832611,32.3782594 31.9583333,35.7966667 C31.0587397,36.6879974 30.0508686,37.4629382 28.9583333,38.1033333 C28.3033941,38.4890431 27.4704606,38.3827841 26.9333333,37.845 L23.6166667,34.53 C28.5053053,31.4496338 32.7452344,27.4440926 36.0983333,22.7383333 L36.0983333,22.7383333 Z" opacity="0.598539807"></path>
+                                      </g>
+                                   </g>
+                                </g>
+                             </g>
+                          </svg>
+                       </div>
+                       <div class="d-flex flex-column">
+                          <h6 class="mb-1 text-dark text-sm">Vaccination</h6>
+                          <span class="text-xs">{{ vaccination_patients_today.count }} Vaccination Patients Today, <span class="font-weight-bold">{{ vaccination.count }} Total Patient Records</span></span>
                        </div>
                     </div>
                     <div class="d-flex">
@@ -522,6 +608,35 @@
                   </div>
                 </div>
               </div>
+
+              <div id="vaccination" class="form-section">
+                <div class="row">
+                  <div class="col-lg-8">
+                    <div class="form-group">
+                      <label for="treatment_needed">Vaccine Name:</label>
+                      <input type="text" class="form-control" id="vaccine_name" name="vaccine_name" >
+                    </div>
+                  </div>
+
+                  <div class="col-lg-4">
+                    <div class="form-group">
+                      <label for="exampleFormControlSelect1">Dose:</label>
+                      <select class="form-control" name="dose" id="exampleFormControlSelect1">
+                        
+                        <option value="3rd Dose">.......................</option>
+                        <option value="1st Dose/Booster">1st Dose / Booster</option>
+                        <option value="2nd Dose">2nd Dose </option>
+                        <option value="3rd Dose">3rd Dose</option>
+                      </select>
+                    </div>
+                  </div>
+
+
+
+                </div>
+              </div>
+
+
             </div>
           </div>
         </div>
@@ -542,6 +657,17 @@
 {% endblock %}
 
 {% block js %}
+
+
+
+<script>
+
+  let cc_table = new DataTable('#cc_table');
+  let bp_table = new DataTable('#bp_table');
+  let dc_table = new DataTable('#dc_table');
+  let vac_table = new DataTable('#vac_table');
+
+</script>
 
 
 <script>
@@ -600,6 +726,7 @@
   document.addEventListener('DOMContentLoaded', function() {
     // Select the form element
     const form = document.getElementById('clinic-consultation-form');
+
 
     // Handle form submission
     form.addEventListener('submit', function(event) {
@@ -668,6 +795,7 @@
   document.addEventListener('DOMContentLoaded', function() {
     const selectLog = document.getElementById('select_log');
     const sections = document.querySelectorAll('.form-section');
+  
 
     function showSection(sectionId) {
         sections.forEach(section => {
@@ -707,6 +835,12 @@
                 showSection('dental_case');
                 $('#clinic-consultation-form').attr('action', '{% url "add-dental-case" %}');
                 break;
+
+            case 'vaccination':
+                showSection('vaccination');
+                $('#clinic-consultation-form').attr('action', '{% url "add-dental-case" %}');
+                break;
+              
             default:
                 sections.forEach(section => section.style.display = 'none');
                 $('#clinic-consultation-form').attr('action', '#'); // Clear action if no option selected
@@ -718,6 +852,9 @@
     // Initial setup
     showSection(selectLog.value);
     updateRequiredFields(selectLog.value);
+
+    // Enable/Disable Date Input
+
 
     // Add form submission validation
     document.getElementById('clinic-consultation-form').addEventListener('submit', function(event) {
@@ -747,7 +884,15 @@
                 isValid = false;
                 alert('Please fill in all required fields for Dental Case.');
             }
-        }
+        } else if (selectedValue === 'vaccination') {
+          const vaccineName = document.getElementById('vaccine_name').value.trim();
+          const dose = document.getElementById('exampleFormControlSelect1').value;
+          if (!vaccineName || !dose) {
+              isValid = false;
+              alert('Please fill in all required fields for Vaccination.');
+          }
+      }
+        
 
         if (!isValid) {
             event.preventDefault(); // Prevent form submission if validation fails

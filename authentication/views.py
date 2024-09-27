@@ -10,10 +10,13 @@ from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
 
 from django.contrib import messages
-from django.contrib.auth.hashers import make_password 
+
 import random
 import string
 from datetime import datetime, date
+
+from django.db import transaction
+from django.contrib.auth.models import Group
 
 
 # Create your views here.
@@ -27,55 +30,60 @@ def register_page(request):
     return render(request, 'authentication/register.html')
 
 
+def staff_login_page(request):
+    return render(request, 'authentication/login_staff.html')
 
 
+def combined_logout(request):
+    # Log out the user
+    logout(request)
+    
+    # Optionally, add a success message
+    messages.success(request, 'You have been successfully logged out.')
+    
+    # Redirect to the login page or home page
+    return redirect('index') 
 
 
-
-def login_user(request):
+def combined_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        
+        user_type = request.POST.get('user_type')  # 'patient' or 'staff'
+
         # Authenticate the user
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            # Check if the user is active
+
             if not user.is_active:
                 messages.warning(request, 'Your account is currently inactive. Please contact the administrator for approval.')
-                return redirect('login-page')
-            else:
-                # Log the user in
+                return redirect(f'{user_type}-login-page') 
+            
+            if user_type == 'patient' and user.groups.filter(name='patient').exists():
+                
+                login(request, user)
+                return redirect('index') 
+            
+            elif user_type == 'staff' and user.groups.filter(name='staff').exists():
+                
                 login(request, user)
                 return redirect('dashboard')
+            
+            else:
+                messages.error(request, 'Invalid login for the specified user type.')
+                return redirect(f'{user_type}-login-page')  
         else:
             # Authentication failed
             messages.error(request, 'Invalid credentials. Please try again.')
-            return redirect('login-page')
+            return redirect(f'{user_type}-login-page')  
 
-    return redirect('login-page')
+    return redirect('index')
 
-def login_user(request):
-  if request.method == 'POST':
-    username = request.POST.get('username')
-    password = request.POST.get('password')
-    
-    user = authenticate(request, username=username, password=password)
 
-    if user is not None:
-      if user.is_active:
-        login(request, user)
-        return redirect('dashboard')
-      else:
-        # User found but inactive, display specific message
-        messages.warning(request, 'Your account is currently inactive. Please contact the administrator for approval.')
-    else:
-      # User not found (or invalid credentials)
-      messages.error(request, 'Invalid credentials. Please try again.')
 
-  # Redirecting to login page in case of GET request or unsuccessful POST
-  return redirect('login-page')
+
+
 
 
 def calculate_age(birthdate):
@@ -83,7 +91,7 @@ def calculate_age(birthdate):
     age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
     return age
 
-from django.db import transaction
+
 def register_user(request):
     if request.method == 'POST':
         try:
@@ -113,6 +121,10 @@ def register_user(request):
                     email=email,
                     is_active=False,
                 )
+
+
+                patient_group, created = Group.objects.get_or_create(name='patient')
+                user.groups.add(patient_group)
 
                 # Create the Patient object
                 patient = Patient.objects.create(

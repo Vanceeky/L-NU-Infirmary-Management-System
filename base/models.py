@@ -35,6 +35,18 @@ class DentalCase(models.Model):
         return f"{self.date_created} - {self.patient} - {self.treatment_needed} - {self.remarks}"
     
 
+class Vaccination(models.Model):
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    vaccine_name = models.CharField(max_length=100)
+    dose = models.CharField(max_length=100, choices=[ ('1st Dose / Booster', '1st Dose/Booster'), ('2nd Dose', '2nd Dose'), ('3rd Dose', '3rd Dose')])
+    next_dose_due = models.DateField(null=True, blank=True)
+
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.date_created} - {self.patient} - {self.vaccine_name} - {self.dose} - {self.next_dose_due}"
+
 
 class AppointmentRequest(models.Model):
 
@@ -73,19 +85,19 @@ class Appointment(models.Model):
     def __str__(self):
         return f"{self.date_created} - {self.patient} - {self.purpose}"
 
+
     
 
 class MedicalCertificateRequest(models.Model):
 
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
 
-    patient_record = models.CharField(max_length=100)
     purpose = models.CharField(max_length=100)
     reason = models.TextField()
     additional_notes = models.TextField(null=True, blank=True)
     additional_file = models.FileField(null=True, blank=True)
 
-    status = models.CharField(max_length=12, choices=[('Pending', 'Pending'), ('Issued', 'Issued'), ('Denied', 'Denied')], default='Pending')
+    status = models.CharField(max_length=12, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Issued', 'Issued'), ('Denied', 'Denied')], default='Pending')
 
 
     date_created = models.DateTimeField(auto_now_add=True)
@@ -100,10 +112,14 @@ class MedicalCertificate(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     purpose = models.CharField(max_length=100)
 
+    remarks = models.TextField(null=True, blank=True)
+
+    qr_code = models.ImageField(upload_to='qr_codes/', null=True, blank=True)
+
     date_created = models.DateTimeField(auto_now_add=True)
 
 
-    status = models.CharField(max_length=12, choices=[('Pending', 'Pending'), ('Received', 'Received')], default='Pending')
+    status = models.CharField(max_length=12, choices=[('Pending', 'Pending'), ('Issued', 'Issued'), ('Received', 'Received')], default='Pending')
 
 
     def __str__(self):

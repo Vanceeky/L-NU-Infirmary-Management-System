@@ -27,78 +27,76 @@
 
           </div>
           <div class="card-body pt-4 p-3">
-            {% if all_cancelled %}
-               <div class="alert alert-warning text-center text-white">
-                  <strong>Note:</strong> All appointments scheduled for today are canceled due to the doctor's unavailability.
-               </div>
-               {% else %}
-               {% if appointments %}
-                  <div class="table-responsive">
-                     <table class="table align-items-center mb-0">
-                        <thead>
-                           <tr>
-                              <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
-                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Patient</th>
-                              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Category</th>
-                              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Reason</th>
-                              
-                              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                              <th class="text-secondary opacity-7"></th>
-                           </tr>
-                        </thead>
-                        <tbody>
-                           {% for ap in appointments %}
 
-                              <tr>
-                                 <td class="text-center">
-                                 <span class="text-secondary text-xs font-weight-bold">{{ ap.id }}</span>
-                                 </td>
+                {% if no_appointments_today %}
+                <div class="alert alert-warning text-center text-white">
+                    <strong>Note:</strong> No appointments are scheduled for today.
+                </div>
+                {% else %}
+                {% if all_cancelled %}
+                    <div class="alert alert-warning text-center text-white">
+                        <strong>Note:</strong> All appointments scheduled for today are canceled due to the doctor's unavailability.
+                    </div>
+                {% else %}
+                    {% if appointments %}
+                        <div class="table-responsive">
+                            <table class="table align-items-center mb-0" id="table-appointments">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Patient</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Category</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Reason</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                                    <th class="text-secondary opacity-7"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ap in appointments %}
+                                    <tr>
+                                        <td class="text-center">
+                                        <span class="text-secondary text-xs font-weight-bold">{{ ap.id }}</span>
+                                        </td>
+                                        <td>
+                                        <div class="d-flex px-2 py-1">
+                                            <div>
+                                                <img src="{{ ap.patient.avatar.url }}" class="avatar avatar-sm me-3" alt="user1">
+                                            </div>
+                                            <div class="d-flex flex-column justify-content-center">
+                                               <h6 class="mb-0 text-sm text-capitalize"> <a href="{% url 'patient-profile-dashboard' ap.patient.user_id_number %}">{{ ap.patient.user.first_name }} {{ ap.patient.user.last_name }} ({{ ap.patient.gender }}, {{ ap.patient.age }})</a></h6>
+                                                <p class="text-xs text-secondary mb-0">{{ ap.patient.user.email }}</p>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td class="text-center">
+                                        <p class="text-xs font-weight-bold mb-0">{{ ap.patient.category }}</p>
+                                        <p class="text-xs text-secondary mb-0">{{ ap.patient.designation }}</p>
+                                        </td>
+                                        <td class="align-middle text-center text-sm">
+                                        <span class="">{{ ap.reason|slice:":10" }}.....</span>
+                                        </td>
+                                        <td class="align-middle text-center text-sm">
+                                        <span class="badge bg-gradient-warning"> {{ ap.status }} </span>
+                                        </td>
+                                        <td class="align-middle">
+                                            <a href="javascript:;" class="text-secondary font-weight-bold text-xs mx-2 evaluate-patient-btn" data-appointment-id="{{ ap.id }}" data-bs-toggle="tooltip" data-bs-title="Evaluate Patient">
+                                                <i class="fa fa-user-edit"></i>
+                                            </a>
+                                        <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-bs-toggle="tooltip" data-bs-title="Delete">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No Appointments incoming today</p>
+                    {% endif %}
+                {% endif %}
+                {% endif %}
 
-                                 <td>
-                                 <div class="d-flex px-2 py-1">
-                                    <div>
-                                          <img src="{{ ap.patient.avatar.url }}" class="avatar avatar-sm me-3" alt="user1">
-                                    </div>
-                                    <div class="d-flex flex-column justify-content-center">
-                                          <h6 class="mb-0 text-sm text-capitalize">{{ ap.patient.user.first_name}} {{ ap.patient.user.last_name}} ({{ap.patient.gender}}, {{ ap.patient.age}})</h6>
-                                          <p class="text-xs text-secondary mb-0">{{ ap.patient.user.email }}</p>
-                                    </div>
-                                 </div>
-                                 </td>
-                                 <td class="text-center">
-                                 <p class="text-xs font-weight-bold mb-0">{{ ap.patient.category}}</p>
-                                 <p class="text-xs text-secondary mb-0">{{ ap.patient.designation }}</p>
-                                 </td>
-                                 <td class="align-middle text-center text-sm">
-                                 <span class="">{{ ap.reason|slice:":10" }}.....</span>
-                                 </td>
-
-                                 <td class="align-middle text-center text-sm">
-                                    <span class="badge bg-gradient-warning"> {{ ap.status }} </span>
-                                 </td>
-
-                                 <td class="align-middle">
-                                 <a href="javascript:;" class="text-secondary font-weight-bold text-xs mx-2" data-bs-toggle="tooltip" data-bs-title="View patient">
-                                 <i class="fa fa-user-edit"></i>
-                                 </a>
-                                 <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-bs-toggle="tooltip" data-bs-title="Delete">
-                                    <i class="fa fa-trash"></i>
-                                    </a>
-                                 </td>
-                              </tr>
-
-                           {% endfor %}
-
-
-                        </tbody>
-                     </table>
-                  </div>
-               {% else %}
-
-                  <p class="text-center">No Appointments incoming today </p>
-               {% endif %}
-               
-            {% endif %}
          </div>
        </div>
     </div>
@@ -115,75 +113,189 @@
           <div class="card-body pt-4 p-3">
              <h6 class="text-uppercase text-body text-xs font-weight-bolder mb-3">Under Evalutation:</h6>
 
-             <ul class="list-group">
-               {% if has_in_progress_appointments %}
-               {% for ap in in_progress_appointments %}
-               <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                     <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fa fa-user-edit" aria-hidden="true"></i></button>
-                     <div class="d-flex flex-column">
-                        <h6 class="mb-1 text-dark text-sm">{{ ap.patient.user.first_name }} {{ ap.patient.user.last_name}}</h6>
-                        <span class="text-xs">{{ ap.patient.category }} / {{ ap.patient.designation}} </span>
-                     </div>
-                  </div>
-                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                     <i class="fa fa-user-edit"></i>
-                  </div>
-               </li>
-               {% endfor %}
-               {% else %}
-                   <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                       <div class="d-flex align-items-center">
-                           <div class="d-flex flex-column">
-                               <h6 class="mb-1 text-dark text-sm">No appointments in progress</h6>
-                           </div>
-                       </div>
-                   </li>
-               {% endif %}
-
-             </ul>
+             <ul class="list-group" id="in-progress-list">
+                <!-- In-progress appointments will be dynamically inserted here -->
+            </ul>
              <h6 class="text-uppercase text-body text-xs font-weight-bolder my-3">In Queue: </h6>
-             <ul class="list-group">
-
-               {% if has_in_queue_appointments %}
-               {% for ap in in_queue_appointments %}
-                       <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                           <div class="d-flex align-items-center">
-                               <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center">
-                                   <i class="fa fa-spinner" aria-hidden="true"></i>
-                               </button>
-                               <div class="d-flex flex-column">
-                                   <h6 class="mb-1 text-dark text-sm">{{ ap.patient.user.first_name }} {{ ap.patient.user.last_name}}</h6>
-                                   <span class="text-xs">{{ ap.patient.category }} / {{ ap.patient.designation}}</span>
-                               </div>
-                           </div>
-                           <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                               <i class="fa-solid fa-circle-check"></i>
-                           </div>
-                       </li>
-                       {% endfor %}
-                       {% else %}
-                           <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                               <div class="d-flex align-items-center">
-                                   <div class="d-flex flex-column">
-                                       <h6 class="mb-1 text-dark text-sm">No appointments in queue</h6>
-                                   </div>
-                               </div>
-                           </li>
-                       {% endif %}
-
-
-                
-
-             </ul>
+             <ul class="list-group" id="in-queue-list">
+                <!-- In-queue appointments will be dynamically inserted here -->
+            </ul>
           </div>
        </div>
     </div>
 </div>
 
+
+<!-- Modal -->
+<div class="modal fade" id="appointment-remarks" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"> 
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Appointment Remarks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="appointment_id" value="">
+                <textarea class="form-control" placeholder="Enter remarks..." id="remarks-text"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn bg-gradient-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 {% endblock %}
 
 {% block js %}
+
+<script>
+    $(document).ready(function() {
+        // Function to fetch and update the appointment lists
+        function fetchAppointments() {
+            $.ajax({
+                url: "{% url 'fetch-appointments' %}",
+                type: 'GET',
+                success: function(response) {
+                    // Update "Under Evaluation" section
+                    var inProgressList = $('#in-progress-list');
+                    inProgressList.empty();
+                    if (response.in_progress.length > 0) {
+                        response.in_progress.forEach(function(ap) {
+                            inProgressList.append(
+                                `<li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                                    <div class="d-flex align-items-center">
+                                        <button  data-bs-toggle="modal" data-bs-target="#appointment-remarks" data-appointment-id-modal="${ap.id}" class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fa fa-user-edit" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">${ap.first_name} ${ap.last_name}</h6>
+                                            <span class="text-xs">${ap.category} / ${ap.designation}</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+                                        <i class="fa fa-user-edit"></i>
+                                    </div>
+                                </li>`
+                            );
+                        });
+                    } else {
+                        inProgressList.append('<li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg"><div class="d-flex align-items-center"><div class="d-flex flex-column"><h6 class="mb-1 text-dark text-sm">No appointments in progress</h6></div></div></li>');
+                    }
+
+                    // Update "In Queue" section
+                    var inQueueList = $('#in-queue-list');
+                    inQueueList.empty();
+                    if (response.in_queue.length > 0) {
+                        response.in_queue.forEach(function(ap) {
+                            inQueueList.append(
+                                `<li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                                    <div class="d-flex align-items-center">
+                                        <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center">${ap.id}</button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">${ap.first_name} ${ap.last_name}</h6>
+                                            <span class="text-xs">${ap.category} / ${ap.designation}</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    </div>
+                                </li>`
+                            );
+                        });
+                    } else {
+                        inQueueList.append('<li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg"><div class="d-flex align-items-center"><div class="d-flex flex-column"><h6 class="mb-1 text-dark text-sm">No appointments in queue</h6></div></div></li>');
+                    }
+                },
+                error: function() {
+                    alert('Error fetching appointments.');
+                }
+            });
+        }
+
+        // Call fetchAppointments when the page loads
+        fetchAppointments();
+
+        // Update this section to call fetchAppointments after status update
+        $('.evaluate-patient-btn').click(function(e) {
+            e.preventDefault(); // Prevent default behavior
+
+            var appointmentId = $(this).data('appointment-id');
+            var button = $(this);
+
+            $.ajax({
+                url: "{% url 'update-appointment-status' 0 %}".replace('0', appointmentId),
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'  // Add CSRF token
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Update the UI based on the new status
+                        button.closest('tr').find('.badge').text(response.new_status);
+                        // Fetch and update the appointment lists
+                        fetchAppointments();
+                    }
+                },
+                error: function() {
+                    alert('Error updating status.');
+                }
+            });
+        });
+
+        $(document).on('click', '[data-appointment-id-modal]', function(e) {
+            e.preventDefault();
+    
+            var appointmentId = $(this).data('appointment-id-modal');
+    
+            // Set the appointment ID in the hidden input field
+            $('#appointment-remarks input[name="appointment_id"]').val(appointmentId);
+    
+            // Show the modal
+            $('#appointment-remarks').modal('show');
+        });
+
+    });
+</script>
+
+
+<!--
+
+<script>
+    $(document).ready(function() {
+        $('.evaluate-patient-btn').click(function() {
+            var appointmentId = $(this).data('appointment-id');
+            var button = $(this);
+
+            $.ajax({
+                url: "{% url 'update-appointment-status' 0 %}".replace('0', appointmentId),
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'  // Add CSRF token
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Update the UI based on the new status
+                        button.closest('tr').find('.badge').text(response.new_status);
+                    }
+                },
+                error: function() {
+                    alert('Error updating status.');
+                }
+            });
+        });
+    });
+</script>
+
+-->
+
+<script>
+
+    let table_appointments = new DataTable('#table-appointments')
+</script>
 
 <script>
    function confirmDoctorAvailability() {

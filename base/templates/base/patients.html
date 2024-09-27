@@ -38,36 +38,38 @@
                 </tr>
               </thead>
               <tbody>
+                {% for patient in patients %}
+
                 <tr>
                   <td class="text-center">
-                    <span class="text-secondary text-sm font-weight-bold">1</span>
+                    <span class="text-secondary text-sm font-weight-bold">{{ patient.user_id_number }}</span>
                   </td>
 
                   <td>
                     <div class="d-flex px-2 py-1">
                       <div>
-                        <img src="/static/assets/img/team-2.jpg" class="avatar avatar-md me-3" alt="user1">
+                        <img src="{{ patient.avatar.url }}" class="avatar avatar-md me-3" alt="user1">
                       </div>
                       <div class="d-flex flex-column justify-content-center">
-                        <h6 class="mb-0 text-md"><a href="{% url 'patient-profile-dashboard' %}">John Michael</a></h6>
-                        <p class="text-sm text-secondary mb-0">Male ( 22 )</p>
+                        <h6 class="mb-0 text-md"><a href="{% url 'patient-profile-dashboard' patient.user_id_number %}">{{ patient.user.first_name }} {{ patient.user.last_name}}</a></h6>
+                        <p class="text-sm text-secondary mb-0">{{ patient.gender }} ( {{ patient.age}} )</p>
                       </div>
                     </div>
                   </td>
                   <td class="">
-                    <p class="text-sm font-weight-bold mb-0">09456656707</p>
-                    <p class="text-sm text-secondary mb-0">mingarine.jamesivan.c@gmail.com</p>
+                    <p class="text-sm font-weight-bold mb-0">{{ patient.contact_number }}</p>
+                    <p class="text-sm text-secondary mb-0">{{ patient.user.email }}</p>
                   </td>
                   <td class="text-center">
-                    <p class="text-sm font-weight-bold mb-0">Student</p>
-                    <p class="text-sm text-secondary mb-0">BSIT</p>
+                    <p class="text-sm font-weight-bold mb-0">{{ patient.category }}</p>
+                    <p class="text-sm text-secondary mb-0">{{ patient.designation }}</p>
                   </td>
                   <td class=" text-center">
-                    <span class="text-secondary text-sm font-weight-bold">July 29, 2024 - 12:00 pm </span>
+                    <span class="text-secondary text-sm font-weight-bold">{{ patient.recent_visit_date }} </span>
                   </td>
 
                   <td class="align-middle text-center text-sm">
-                    <span class="font-weight-bold text-secondary">5</span>
+                    <span class="font-weight-bold text-secondary">{{ patient.visit_count }}</span>
                   </td>
 
                   <td class="align-middle">
@@ -77,7 +79,8 @@
                     </a>
                   </td>
                 </tr>
-
+                
+                {% endfor %}
               </tbody>
             </table>
           </div>
@@ -88,7 +91,7 @@
             <div class="card-header pb-0 p-3 mt-0">
                 <div class="d-flex justify-content-between">
                   <h6 class="mb-2">Patient Demographics</h6>
-                  <small class="text-md">Total Patients: <span class="font-weight-bold text-secondary">160</span></small>
+                  <small class="text-md">Total Patients: <span class="font-weight-bold text-secondary">{{ patients.count }}</span></small>
                   
                 </div>
             </div>
@@ -104,7 +107,7 @@
                       <div class="numbers">
                         <p class="text-sm mb-0 text-uppercase font-weight-bold">Students as Patients</p>
                         <h5 class="font-weight-bolder text-white">
-                          150
+                          {{ patient_student_count }}
                         </h5>
     
                       </div>
@@ -126,7 +129,7 @@
                       <div class="numbers">
                         <p class="text-sm mb-0 text-uppercase font-weight-bold">Employees as Patients</p>
                         <h5 class="font-weight-bolder text-white">
-                          10
+                          {{ patient_employee_count }}
                         </h5>
                       </div>
                     </div>
