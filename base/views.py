@@ -12,13 +12,15 @@ import calendar
 from django.db.models import Count, OuterRef, Subquery
 from django.db.models.functions import ExtractMonth
 from django.contrib import messages
-
+from django.core.exceptions import PermissionDenied
 
 from io import BytesIO
 import qrcode
 
 
 from django.core.files.base import ContentFile
+
+from .decorators import staff_only, patient_only
 
 
 def monthly_model_counts(request):
@@ -77,6 +79,8 @@ def model_counts(request):
     }
     return JsonResponse(counts)
 
+
+
 def index(request):
     # Initialize patient and records variables
     patient = None
@@ -92,7 +96,8 @@ def index(request):
             records = get_patient_records(patient.id)
         else:
             # If the user is authenticated but not a patient, redirect to an error page
-            return HttpResponseForbidden("You do not have permission to view this page.")
+
+            raise PermissionDenied
 
     # Render the page for authenticated patients or unauthenticated users
     context = {
@@ -195,6 +200,8 @@ def daily_logs(request):
     vaccination = Vaccination.objects.all()
 
 
+    patients = Patient.objects.all()
+
     context = {
         'clinic_consultation': clinic_consultation,
         'BPMonitoring': bp,
@@ -204,7 +211,9 @@ def daily_logs(request):
         'clinic_patients_today': clinic_consultations_today,
         'bp_patients_today': bp_records_today,
         'dental_patients_today': dental_cases_today,
-        'vaccination_patients_today': vaccination_records_today
+        'vaccination_patients_today': vaccination_records_today,
+
+        'patients': patients
     }
 
     print(clinic_consultations_today)
@@ -272,6 +281,8 @@ def fetch_appointments(request):
     in_progress_data = [
         {
             'id': ap.id,
+            'patient_id': ap.patient.id,
+
             'first_name': ap.patient.user.first_name,
             'last_name': ap.patient.user.last_name,
             'category': ap.patient.category,
@@ -300,8 +311,39 @@ def fetch_appointments(request):
 
 def appointment_remarks(request):
     if request.method == 'POST':
-        pass
+        patient_id = request.POST.get('patient_id')
+        appointment_id = request.POST.get('appointment_id')
+        remarks = request.POST.get('remarks')
 
+        request_ = AppointmentRequest.objects.get(id=appointment_id)
+
+        patient = Patient.objects.get(id=patient_id)
+
+        request_.status = 'Completed'
+        request_.save()
+
+        appointment = Appointment.objects.create(
+            patient = patient,
+            purpose = request_.reason,
+            remarks = remarks,
+        )
+
+        appointment.save()
+
+        return JsonResponse({'message': 'Appointment remarks updated successfully'})
+
+
+
+def move_first_in_queue(request):
+    if request.method == 'POST':
+        first_in_queue = AppointmentRequest.objects.filter(status='In Queue').order_by('date_created').first()
+        if first_in_queue:
+            first_in_queue.status = 'In Progress'
+            first_in_queue.save()
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'no_appointments'})
+        
 
 def patients(request):
 
@@ -349,9 +391,8 @@ def patients(request):
 
 
 
-def inventory(request):
-    return render(request, 'base/inventory.html')
-
+def patient_account_request(request):
+    return render(request, 'base/patient_account_request.html')
 
 
 def medcerts(request):
@@ -435,7 +476,7 @@ def approve_med_cert_request(request):
         medical_certificate.save()
 
         messages.success(request, 'Medical certificate request approved successfully.')
-        return redirect('medcerts')  # Replace with your desired URL
+        return redirect('view-med-cert', medical_certificate.id)  # Replace with your desired URL
 
     return HttpResponse(status=400)
 
@@ -802,6 +843,8 @@ def send_appointment_reminders(request):
     
     return JsonResponse({'message': 'Emails sent successfully'})
 
+
+
 def send_cancel_appointment_reminder(request):
     today = timezone.now().date()
 
@@ -851,3 +894,157 @@ def send_cancel_appointment_reminder(request):
             print(f"Error sending email to {email}: {e}")
     
     return JsonResponse({'message': 'Emails sent successfully'})
+
+
+
+
+
+
+
+
+def medicine_supply(request):
+    medicines = Medicine.objects.all()
+    patients = Patient.objects.all()
+    medicines_usages = MedicineUsage.objects.all()
+
+    context = {
+        'medicines': medicines,
+        'patients': patients,
+        'medicines_usages': medicines_usages,
+
+    }
+    return render(request, 'base/medicine_supply.html', context)
+
+
+
+# View for adding medicine
+def add_medicine(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+        quantity_in_stock = request.POST['quantity_in_stock']
+        unit_of_measure = request.POST['unit_of_measure']
+        expiration_date = request.POST['expiration_date']
+        description = request.POST['description']
+
+        # Case-insensitive check if the medicine with the same name already exists
+        if Medicine.objects.filter(name__iexact=name).exists():
+            response = {
+                'status': 'error',
+                'message': f"{name} already exists in the inventory."
+            }
+            return JsonResponse(response, status=400)
+
+        try:
+            # Create the new medicine entry
+            medicine = Medicine.objects.create(
+                name=name,
+                quantity_in_stock=quantity_in_stock,
+                unit_of_measure=unit_of_measure,
+                expiration_date=expiration_date,
+                description=description,
+            )
+
+            response = {
+                'status': 'success',
+                'message': f"{medicine.name} has been added to the inventory."
+            }
+            return JsonResponse(response)
+
+        except Exception as e:
+            # Error handling
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+def add_medication(request):
+    if request.method == "POST":
+        try:
+            # Get the data from the request
+            patient_id = request.POST.get('patient')
+            medicine_id = request.POST.get('medicine')
+            quantity_used = int(request.POST.get('quantity'))
+            remarks = request.POST.get('remarks')
+
+            # Fetch the patient and medicine objects
+            medicine = Medicine.objects.get(id=medicine_id)
+            patient = Patient.objects.get(id=patient_id)
+
+            # Check if the quantity is available
+            if quantity_used > medicine.quantity_in_stock:
+                return JsonResponse({'status': 'error', 'message': 'Not enough stock available.'}, status=400)
+
+            # Create the MedicineUsage record
+            medicine_usage = MedicineUsage(
+                patient=patient,
+                medicine=medicine,
+                quantity_used=quantity_used,
+                remarks=remarks
+            )
+            medicine_usage.save()
+
+            # Return a success response with status
+            return JsonResponse({'status': 'success', 'message': 'Medication added successfully.'}, status=201)
+
+        except Medicine.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Medicine not found.'}, status=404)
+        except ValueError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid quantity.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+
+
+
+# View for updating medicine supply
+def update_medicine_supply(request, medicine_id):
+    medicine = get_object_or_404(Medicine, id=medicine_id)
+    if request.method == 'POST':
+        quantity_added = int(request.POST['quantity_added'])
+        remarks = request.POST.get('remarks', '')
+
+        restock = MedicineRestock.objects.create(
+            medicine=medicine,
+            quantity_added=quantity_added,
+            remarks=remarks
+        )
+        response = {
+            'status': 'success',
+            'message': f"{quantity_added} units of {medicine.name} were added to the inventory."
+        }
+        return JsonResponse(response)
+    
+    return render(request, 'base/medicine_supply.html', {'medicine': medicine})
+
+# View for adding medicine usage
+def add_medicine_usage(request, patient_id):
+    patient = get_object_or_404(Patient, id=patient_id)
+    medicines = Medicine.objects.all()
+
+    if request.method == 'POST':
+        medicine_id = request.POST['medicine']
+        quantity_used = int(request.POST['quantity_used'])
+        remarks = request.POST.get('remarks', '')
+
+        medicine = get_object_or_404(Medicine, id=medicine_id)
+        if medicine.quantity_in_stock >= quantity_used:
+
+            usage = MedicineUsage.objects.create(
+                patient=patient,
+                medicine=medicine,
+                quantity_used=quantity_used,
+                remarks=remarks
+            )
+            response = {
+                'status': 'success',
+                'message': f"{quantity_used} units of {medicine.name} have been given to {patient.user.first_name}."
+            }
+        else:
+            response = {
+                'status': 'error',
+                'message': f"Not enough {medicine.name} in stock."
+            }
+        return JsonResponse(response)
+    
+    return render(request, 'base/medicine_supply.html', {'patient': patient, 'medicines': medicines})
+

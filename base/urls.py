@@ -13,7 +13,16 @@ urlpatterns = [
     path('patient/<int:patient_id>/', views.patient_profile, name="patient-profile"),
 
 
-    path('inventory/', views.inventory, name="inventory"),
+
+    path('medicine-supply/', views.medicine_supply, name="medicine_supply"),
+    path('add-medicine/', views.add_medicine, name="add_medicine"),
+    path('add-medication/', views.add_medication, name='add_medication'),
+
+
+
+
+
+
     path('appointments/', views.appointments, name="appointments"),
 
     path('update-appointment-status/<int:appointment_id>/', views.update_appointment_status, name='update-appointment-status'),
@@ -33,6 +42,9 @@ urlpatterns = [
     path('request-appointment/', views.request_appointment, name="request-appointment"),
     path('appointment-reminder/', views.send_appointment_reminders, name="appointment-reminder"),
     path('appointment-reminder/cancelled/', views.send_cancel_appointment_reminder, name="cancel-appointment-reminder"),
+    path('appointment-remarks/', views.appointment_remarks, name="appointment_remarks"),
+
+    path('move-in-queue/', views.move_first_in_queue, name="move-first-in-queue"),
 
     path('medical-certificates/', views.medcerts, name="medcerts"),
 

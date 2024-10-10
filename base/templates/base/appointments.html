@@ -17,7 +17,9 @@
           <div class="card-header pb-0 px-3 d-flex justify-content-between align-items-center">
           
                 <h6 class="mb-0">Today's Appointment  
-                    ( <i class="far fa-user me-2" aria-hidden="true"></i>{{ appointments.count }} )</h6>
+                    ( <i class="far fa-user me-2" aria-hidden="true"></i> {% if appointments.count is None %} 0 {% else %} {{ appointments.count }} {% endif %} )
+                
+                </h6>
                
         
                 
@@ -129,7 +131,10 @@
 <!-- Modal -->
 <div class="modal fade" id="appointment-remarks" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"> 
     <div class="modal-dialog modal-dialog-centered" role="document">
+
         <div class="modal-content">
+            <form method="POST" action="{% url 'appointment_remarks' %}">
+                {% csrf_token %}
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Appointment Remarks</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
@@ -138,13 +143,16 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" name="appointment_id" value="">
-                <textarea class="form-control" placeholder="Enter remarks..." id="remarks-text"></textarea>
+                <input type="hidden" name="patient_id" value="">
+                <textarea class="form-control" name="remarks" placeholder="Enter remarks..." id="remarks-text"></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn bg-gradient-primary">Save changes</button>
+                <button type="submit" class="btn bg-gradient-primary">Save changes</button>
             </div>
+        </form>
         </div>
+       
     </div>
 </div>
 
@@ -153,6 +161,162 @@
 {% endblock %}
 
 {% block js %}
+
+<!--
+<script>
+    $(document).ready(function() {
+        // Function to fetch and update the appointment lists
+        function fetchAppointments() {
+            $.ajax({
+                url: "{% url 'fetch-appointments' %}",
+                type: 'GET',
+                success: function(response) {
+                    // Update "Under Evaluation" section
+                    var inProgressList = $('#in-progress-list');
+                    inProgressList.empty();
+                    if (response.in_progress.length > 0) {
+                        response.in_progress.forEach(function(ap) {
+                            inProgressList.append(
+                                `<li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                                    <div class="d-flex align-items-center">
+                                        <button data-bs-toggle="modal" data-bs-target="#appointment-remarks" data-appointment-id="${ap.id}" data-appointment-id-modal="${ap.patient_id}" class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fa fa-user-edit" aria-hidden="true"></i></button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">${ap.first_name} ${ap.last_name}</h6>
+                                            <span class="text-xs">${ap.category} / ${ap.designation}</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+                                        <i class="fa fa-user-edit"></i>
+                                    </div>
+                                </li>`
+                            );
+                        });
+                    } else {
+                        inProgressList.append('<li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg"><div class="d-flex align-items-center"><div class="d-flex flex-column"><h6 class="mb-1 text-dark text-sm">No appointments in progress</h6></div></div></li>');
+                    }
+    
+                    // Update "In Queue" section
+                    var inQueueList = $('#in-queue-list');
+                    inQueueList.empty();
+                    if (response.in_queue.length > 0) {
+                        response.in_queue.forEach(function(ap) {
+                            inQueueList.append(
+                                `<li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                                    <div class="d-flex align-items-center">
+                                        <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center">${ap.id}</button>
+                                        <div class="d-flex flex-column">
+                                            <h6 class="mb-1 text-dark text-sm">${ap.first_name} ${ap.last_name}</h6>
+                                            <span class="text-xs">${ap.category} / ${ap.designation}</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    </div>
+                                </li>`
+                            );
+                        });
+                    } else {
+                        inQueueList.append('<li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg"><div class="d-flex align-items-center"><div class="d-flex flex-column"><h6 class="mb-1 text-dark text-sm">No appointments in queue</h6></div></div></li>');
+                    }
+                },
+                error: function() {
+                    alert('Error fetching appointments.');
+                }
+            });
+        }
+    
+        // Call fetchAppointments when the page loads
+        fetchAppointments();
+        $('.evaluate-patient-btn').click(function(e) {
+            e.preventDefault(); // Prevent default behavior
+
+            var appointmentId = $(this).data('appointment-id');
+            var button = $(this);
+
+            $.ajax({
+                url: "{% url 'update-appointment-status' 0 %}".replace('0', appointmentId),
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'  // Add CSRF token
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Update the UI based on the new status
+                        button.closest('tr').find('.badge').text(response.new_status);
+                        // Fetch and update the appointment lists
+                        fetchAppointments();
+                    }
+                },
+                error: function() {
+                    alert('Error updating status.');
+                }
+            });
+        });
+
+        // Handle the submission of the appointment remarks form using AJAX
+        $('#appointment-remarks form').submit(function(e) {
+            e.preventDefault();
+    
+            var formData = $(this).serialize(); // Serialize the form data for AJAX
+    
+            $.ajax({
+                url: "{% url 'appointment_remarks' %}",
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    // Close the modal
+                    $('#appointment-remarks').modal('hide');
+                    // Clear the form inputs
+                    $('#appointment-remarks input[name="patient_id"]').val('');
+                    $('#appointment-remarks input[name="appointment_id"]').val('');
+                    $('#appointment-remarks textarea[name="remarks"]').val('');
+        
+                    // Update the appointment lists after form submission
+                    fetchAppointments();
+    
+                    // Move the first in queue to in progress after marking the current one as completed
+                    $.ajax({
+                        url: "{% url 'move-first-in-queue' %}",
+                        type: 'POST',
+                        data: {
+                            'csrfmiddlewaretoken': '{{ csrf_token }}' // Include CSRF token
+                        },
+                        success: function(response) {
+                            // Fetch and update the appointment lists again after status update
+                            fetchAppointments();
+                        },
+                        error: function() {
+                            alert('Error moving the first appointment in queue.');
+                        }
+                    });
+                },
+                error: function() {
+                    alert('Error submitting remarks.');
+                }
+            });
+        });
+    
+        // Open the modal and set the patient and appointment IDs
+        $(document).on('click', '[data-appointment-id-modal]', function(e) {
+            e.preventDefault();
+    
+            var patientId = $(this).data('appointment-id-modal');
+            var appointmentId = $(this).data('appointment-id');
+    
+            // Set the appointment ID in the hidden input fields
+            $('#appointment-remarks input[name="patient_id"]').val(patientId);
+            $('#appointment-remarks input[name="appointment_id"]').val(appointmentId);
+    
+            // Show the modal
+            $('#appointment-remarks').modal('show');
+
+        });
+    });
+
+    
+</script>
+-->
+
 
 <script>
     $(document).ready(function() {
@@ -170,7 +334,7 @@
                             inProgressList.append(
                                 `<li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                                     <div class="d-flex align-items-center">
-                                        <button  data-bs-toggle="modal" data-bs-target="#appointment-remarks" data-appointment-id-modal="${ap.id}" class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fa fa-user-edit" aria-hidden="true"></i></button>
+                                        <button  data-bs-toggle="modal" data-bs-target="#appointment-remarks" data-appointment-id="${ap.id}" data-appointment-id-modal="${ap.patient_id}" class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fa fa-user-edit" aria-hidden="true"></i></button>
                                         <div class="d-flex flex-column">
                                             <h6 class="mb-1 text-dark text-sm">${ap.first_name} ${ap.last_name}</h6>
                                             <span class="text-xs">${ap.category} / ${ap.designation}</span>
@@ -246,13 +410,59 @@
             });
         });
 
+                // Handle the submission of the appointment remarks form using AJAX
+        $('#appointment-remarks form').submit(function(e) {
+            e.preventDefault();
+    
+            var formData = $(this).serialize(); // Serialize the form data for AJAX
+    
+            $.ajax({
+                url: "{% url 'appointment_remarks' %}",
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    // Close the modal
+                    $('#appointment-remarks').modal('hide');
+                    // Clear the form inputs
+                    $('#appointment-remarks input[name="patient_id"]').val('');
+                    $('#appointment-remarks input[name="appointment_id"]').val('');
+                    $('#appointment-remarks textarea[name="remarks"]').val('');
+        
+                    // Update the appointment lists after form submission
+                    fetchAppointments();
+    
+                    // Move the first in queue to in progress after marking the current one as completed
+                    $.ajax({
+                        url: "{% url 'move-first-in-queue' %}",
+                        type: 'POST',
+                        data: {
+                            'csrfmiddlewaretoken': '{{ csrf_token }}' // Include CSRF token
+                        },
+                        success: function(response) {
+                            // Fetch and update the appointment lists again after status update
+                            fetchAppointments();
+                        },
+                        error: function() {
+                            alert('Error moving the first appointment in queue.');
+                        }
+                    });
+                },
+                error: function() {
+                    alert('Error submitting remarks.');
+                }
+            });
+        });
+
+
         $(document).on('click', '[data-appointment-id-modal]', function(e) {
             e.preventDefault();
     
-            var appointmentId = $(this).data('appointment-id-modal');
+            var patientId = $(this).data('appointment-id-modal');
+            var apppointmentId = $(this).data('appointment-id')
     
             // Set the appointment ID in the hidden input field
-            $('#appointment-remarks input[name="appointment_id"]').val(appointmentId);
+            $('#appointment-remarks input[name="patient_id"]').val(patientId);
+            $('#appointment-remarks input[name="appointment_id"]').val(apppointmentId)
     
             // Show the modal
             $('#appointment-remarks').modal('show');
@@ -260,7 +470,6 @@
 
     });
 </script>
-
 
 <!--
 

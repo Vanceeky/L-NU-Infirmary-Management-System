@@ -1,0 +1,415 @@
+{% extends 'base.html' %}
+
+
+{% block title %} Medicine Supply {% endblock %}
+
+
+{% block css %}
+
+
+    #medicine_table_wrapper, #record_table_wrapper{
+        padding: 10px;
+    }
+
+
+
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-8 col-12">
+        <div class="card h-auto" id="medicine-section">
+            <!-- Medicine Supply View -->
+            <div id="medicine-supply-view">
+                <div class="card-header d-flex justify-content-between align-items-center pb-0 px-3">
+                    <h6 class="mb-0">Medicine Supply</h6>
+                    <div class="d-flex align-items-center">
+                        <a type="button" data-bs-toggle="modal" data-bs-target="#add-medicine" class="fw-bold text-success"><i class="fa fa-plus me-1"></i>Add Medicine Supply</a>
+                        <div class="vr mx-2"></div>
+                        <a href="javascript:void(0);" class="me-3 fw-bold text-secondary" onclick="toggleView('records')">
+                            <i class="fa fa-eye me-1"></i>View Records
+                        </a>
+                    </div>
+                </div>
+    
+                <div class="table-responsive">
+                    <table class="table align-items-center mb-0" id="medicine_table">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quantity in Stock</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Unit of Measure</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Expiration Date</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
+                                <th class="text-secondary opacity-7"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for medicine in medicines %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex">
+                                            <img class="w-10 ms-3" src="/static/assets/img/1106992.png" alt="{{ medicine.name }}">
+                                            <h6 class="ms-3 my-auto text-uppercase">{{ medicine.name }}</h6>
+                                            </div>
+                                    </td>
+                                    <td class="text-center text-sm">{{ medicine.quantity_in_stock }}</td>
+                                    <td class="text-center text-sm">{{ medicine.unit_of_measure }}</td>
+                                    <td class="text-center text-sm">{{ medicine.expiration_date }}</td>
+                                    <td class="text-center text-sm">{{ medicine.description }}</td>
+                                    <td>
+                                        <a href="" class="mx-3" data-bs-toggle="tooltip" data-bs-original-title="Update">
+                                            <i class="fas fa-edit text-secondary"></i>
+                                        </a>
+                                        <a href="" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                                            <i class="fas fa-trash text-secondary"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    
+            <!-- Medicine Records View (Initially Hidden) -->
+            <div id="medicine-records-view" style="display:none;">
+                <div class="card-header d-flex justify-content-between align-items-center pb-0 px-3">
+                    <h6 class="mb-0">Medicine Records</h6>
+                    <div class="d-flex align-items-center">
+                        <a type="button" data-bs-toggle="modal" data-bs-target="#add-medicine" class="fw-bold text-success"><i class="fa fa-plus me-1"></i>Add Medicine Supply</a>
+                        <div class="vr mx-2"></div>
+                        <a href="javascript:void(0);" class="fw-bold text-secondary" onclick="toggleView('supply')">
+                            <i class="fa fa-eye me-1"></i>View Supplies
+                        </a>
+                    </div>
+                </div>
+    
+                <div class="table-responsive">
+                    <table class="table align-items-center mb-0" id="record_table">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Patient</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Medicine</th>
+                                <th class="text-center text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quantity Used</th>
+                                <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date Given</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Remarks</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for medicine in medicines_usages %}
+
+                                <tr>
+                                    <td>
+                                        <div class="d-flex px-2 py-1">
+                                            <div>
+                                              <img src="{{ medicine.patient.avatar.url }}" class="avatar avatar-md me-3" alt="user1">
+                                            </div>
+                                            <div class="d-flex flex-column justify-content-center">
+                                              <h6 class="mb-0 text-md text-capitalize"><a href="{% url 'patient-profile-dashboard' medicine.patient.user_id_number %}">{{ medicine.patient.user.first_name }} {{ medicine.patient.user.last_name}}</a></h6>
+                                              <p class="text-sm text-secondary mb-0">{{ medicine.patient.category }} ( {{ medicine.patient.designation}} )</p>
+                                            </div>
+                                          </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <p class="text-xs font-weight-bold mb-0 text-uppercase">{{ medicine.medicine.name }}</p>
+                                        <p class="text-xs text-secondary mb-0">{{ patient.user.email }}</p>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <p class="text-xs font-weight-bold mb-0 text-uppercase">{{ medicine.quantity_used }}</p>
+                                        <p class="text-xs text-secondary mb-0">{{ patient.user.email }}</p>
+                                    </td>
+
+                                    <td class="">
+                                        <p class="text-xs font-weight-bold mb-0 text-uppercase">{{ medicine.date_given }}</p>
+                                        
+                                    </td>
+
+                                    <td class="text-center">
+                                        <p class="text-xs font-weight-bold mb-0 text-uppercase">{{ medicine.remarks }}</p>
+                                        
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+
+    <div class="col-md-4 col-12"  id="sidebar">
+
+        
+        <div class="card">
+            <div class="card-header pb-0 px-3 mb-0 border-bottom">
+                <h6 class=" mb-2 text-center"> Add Patient Medication</h6>
+            </div>
+
+            <div class="card-body p-2 mt-0">
+
+                <form role="form" method="POST" id="add-patient-medication">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                            
+                        <label for="exampleFormControlSelect1">Select Patient</label>
+                        <select class="form-select" required name="patient" id="select_patient">
+                            <option value="" selected disabled>Select patient</option> <!-- Default option -->
+                            {% for p in patients %}
+                            <option value="{{ p.id }}">{{p}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label>Select Medicine</label>
+                                <select class="form-select" name="medicine" id="select_medicine">
+                                    <option value="" selected required disabled>Select medicine</option> <!-- Default option -->
+                                    {% for p in medicines %}
+                                    <option  value="{{ p.id }}">{{p.name}} - Stock: {{ p.quantity_in_stock}} - Expires on: {{ p.expiration_date}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+            
+
+                            <div class="form-group">
+                                <label for="exampleFormControlInput1">Quantity</label>
+                                <input type="number" name="quantity" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea1">Remarks</label>
+                            <textarea class="form-control" name="remarks" id="exampleFormControlTextarea1" rows="1"></textarea>
+                        </div>
+
+                    </div>
+
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-round bg-gradient-info btn-lg w-100 mb-0">Add Medication</button>
+                    </div>
+
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<div class="col-md-4">
+    <div class="modal fade" id="add-medicine" tabindex="-1" role="dialog" aria-labelledby="modal-notification" aria-hidden="true">
+      <div class="modal-dialog modal-danger modal-dialog-centered modal-" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="modal-title" id="modal-title-notification">Add Medicine Supply</h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          
+            <form role="form text-left" method="POST" id="add-medicine-form">
+                {% csrf_token %}
+
+                
+                <div class="modal-body">
+                        <div class="row">
+                            <div class='col-12'>
+                                <div class="form-group">
+                                    <label for="exampleFormControlInput1">Name</label>
+                                    <input type="text" name="name" required class="form-control" id="exampleFormControlInput1" placeholder="e.g., Paracetamol">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 col-12">
+                                <div class="form-group">
+                                    <label for="exampleFormControlInput1">Quantity in Stock</label>
+                                    <input type="number" name="quantity_in_stock" class="form-control" id="exampleFormControlInput1" placeholder="e.g., 50">
+                                </div>
+
+
+                            </div>
+
+                            <div class="col-md-4 col-12">
+                                <div class="form-group">
+                                    <label for="exampleFormControlInput1">Unit of Measure</label>
+                                    <input type="text" name="unit_of_measure" class="form-control" id="exampleFormControlInput1" placeholder="e.g., tablets, ml">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 col-12">
+                                <div class="form-group">
+                                    <label for="exampleFormControlInput1">Expiration Date: </label>
+                                    <input type="date" name="expiration_date" class="form-control" id="exampleFormControlInput1">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="exampleFormControlTextarea1">Description</label>
+                                <textarea class="form-control" name="description" id="exampleFormControlTextarea1" rows="1"></textarea>
+                            </div>
+
+
+
+                        </div>
+
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-white">Save</button>
+                    <button type="button" class="btn btn-danger text-white ml-auto" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+
+        </div>
+      </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block js%}
+
+<script>
+    $(document).ready(function() {
+        $('#select_patient').select2({
+            placeholder: ".........................",
+            allowClear: true,
+        });
+
+        $('#select_medicine').select2({
+            placeholder: ".........................",
+            allowClear: true,
+        });
+
+    });
+</script>
+
+
+<script>
+
+    let medicine_table = new DataTable('#medicine_table')
+    let record_table = new DataTable('#record_table')
+</script>
+
+<script>
+    function toggleView(view) {
+        var supplyView = document.getElementById('medicine-supply-view');
+        var recordsView = document.getElementById('medicine-records-view');
+
+        if (view === 'records') {
+            supplyView.style.display = 'none';
+            recordsView.style.display = 'block';
+        } else {
+            supplyView.style.display = 'block';
+            recordsView.style.display = 'none';
+        }
+    }
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    $('#add-patient-medication').on('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        console.log("Form submitted!"); // Check if the form is being submitted
+
+        $.ajax({
+            url: "{% url 'add_medication' %}", // Update this with the correct URL
+            method: "POST",
+            data: $(this).serialize(),
+            success: function(response) {
+                console.log(response); // Log the response to inspect it
+                if (response.status === 'success') {
+                    // Show success SweetAlert for medication addition
+                    Swal.fire({
+                        icon: "success",
+                        title: "Medication Added!",
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    // Reload the page after the alert
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1500); // Wait until SweetAlert finishes before reloading
+                }
+            },
+            error: function(xhr) {
+                // Parse the response to get the error message
+                console.log(xhr.responseText); // Log the error response
+                let response = JSON.parse(xhr.responseText);
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Oops...',
+                    text: response.message, // Display the specific error message from the server
+                });
+            }
+        });
+    });
+
+    // Handle the second form (add medicine)
+    $('#add-medicine-form').on('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        $.ajax({
+            url: "{% url 'add_medicine' %}", // Update this with the correct URL
+            method: "POST",
+            data: $(this).serialize(),
+            success: function(response) {
+                if (response.status === 'success') {
+                    // Show success SweetAlert for medicine addition
+                    Swal.fire({
+                        icon: "success",
+                        title: "Medicine Added!",
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    // Reload the page after the alert
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1500); // Wait until SweetAlert finishes before reloading
+                }
+            },
+            error: function(xhr) {
+                // Parse the response to get the error message
+                let response = JSON.parse(xhr.responseText);
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Oops...',
+                    text: response.message, // Display the specific error message from the server
+                });
+            }
+        });
+    });
+</script>
+
+
+
+{% endblock %}

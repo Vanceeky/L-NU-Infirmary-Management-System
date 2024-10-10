@@ -16,6 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import handler403, handler404, handler500
+from authentication import views  # Replace with your actual app name
+
+# Custom error handlers
+handler403 = 'authentication.views.custom_403_view'
+handler404 = 'authentication.views.custom_404_view'
+handler500 = 'authentication.views.custom_500_view'
 
 urlpatterns = [
     path('admin/', admin.site.urls),

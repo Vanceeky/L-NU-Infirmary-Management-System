@@ -21,6 +21,19 @@ from django.contrib.auth.models import Group
 
 # Create your views here.
 
+# 403 Forbidden
+def custom_403_view(request, exception=None):
+    return render(request, 'authentication/errors/403.html', status=403)
+
+# 404 Page Not Found
+def custom_404_view(request, exception=None):
+    return render(request, 'authentication/errors/404.html', status=404)
+
+# 500 Server Error
+def custom_500_view(request):
+    return render(request, 'authentication/errors/500.html', status=500)
+
+
 
 def login_page(request):
     return render(request, 'authentication/login.html')
@@ -119,7 +132,7 @@ def register_user(request):
                     first_name=firstname,
                     last_name=lastname,
                     email=email,
-                    is_active=False,
+                    is_active=True,
                 )
 
 
@@ -175,3 +188,9 @@ def register_user(request):
 
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+    
+
+
+
+def access_denied(request):
+    return render(request, 'authentication/access_denied.html')

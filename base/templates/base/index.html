@@ -130,7 +130,7 @@
             {% if request.user.is_authenticated %}
               {% if records %}
 
-              <form role="form text-left" action="{% url 'request-medcert' %}" method="POST" enctype="multipart/form-data">
+              <form role="form text-left" id="med-cert-request-form" action="{% url 'request-medcert' %}" method="POST" enctype="multipart/form-data">
 
                 {% csrf_token %}
 
@@ -206,6 +206,49 @@
 
 {% block js %}
 
+<script>
+  $(document).ready(function() {
+    $('#med-cert-request-form').submit(function(e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        // Create FormData object to handle file uploads
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false, // Don't process the files
+            contentType: false, // Set content type to false since it's multipart/form-data
+            success: function(response) {
+                // Show SweetAlert2 success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Request Sent!',
+                    text: 'Your medical certificate request has been submitted successfully.',
+                    confirmButtonText: 'OK'
+                });
+
+                // Clear the form after success
+                $('#med-cert-request-form')[0].reset();
+
+                $('#modal-medcert').modal('hide');
+
+            },
+            error: function(response) {
+                // Show SweetAlert2 error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong! Please try again later.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    });
+});
+
+</script>
 
 <script>
   function disablePastDatesAndSundays() {

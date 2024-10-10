@@ -13,6 +13,9 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
 <!DOCTYPE html>
+
+{% load static %}
+
 <html lang="en">
 
 <head>
@@ -33,20 +36,22 @@
 
   <link href="/static/assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- CSS Files -->
-  <link id="pagestyle" href="/static/assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+  <link id="pagestyle" href="{% static '/assets/css/argon-dashboard.css' %}?v=2.0.4" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bs-stepper/dist/css/bs-stepper.min.css">
   
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
   <link rel="stylesheet" href="/static/assets/css/dataTables.min.css">
-  
 
-  
+  <!-- Include Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+
   
   <style>
     body {
-        background: url('/static/assets/img/BGDESKTOP.jpg') !important;
+        background: url("{% static '/assets/img/BGDESKTOP.jpg' %}") !important;
         background-repeat: no-repeat !important;
         background-size: cover !important;
         background-attachment: fixed !important;
@@ -54,12 +59,15 @@
 
     {% block css %}
 
+
+
     {% endblock %}
 
   </style>
 </head>
 
 <body class="g-sidenav-show   bg-gray-100">
+
     <!--
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
   -->

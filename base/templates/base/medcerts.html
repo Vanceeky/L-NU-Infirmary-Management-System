@@ -22,9 +22,9 @@
               <h6 class="mb-0"><a href="" class="btn btn-sm btn-outline-secondary text-dark">Create Med-Cert</a></h6>
             </div>
           </div>
-          <div class="table-responsive">
+          <div class="table-responsive p-2">
             {% if medcerts %}
-            <table class="table align-items-center mb-0">
+            <table class="table align-items-center mb-0" id="med_cert_table">
               <thead>
                 <tr>
                   <th class="text-uppercase text-center text-secondary text-xs font-weight-bolder opacity-7">ID</th>
@@ -79,7 +79,7 @@
                   </td>
 
                   <td class="align-middle text-center text-sm">
-                    <span class="font-weight-bold text-secondary"><a href="{% url 'view-med-cert' med.id %}" type="button" class="btn btn-link text-dark text-sm mb-0 px-0 ms-4"><i class="fa fa-print text-lg me-1" aria-hidden="true"></i> Print</a></span>
+                    <span class="font-weight-bold text-secondary"><a href="{% url 'view-med-cert' med.id %}" type="button" target="_blank" class="btn btn-link text-dark text-sm mb-0 px-0 ms-4"><i class="fa fa-print text-lg me-1" aria-hidden="true"></i> Print</a></span>
                   </td>
 
                 </tr>
@@ -130,7 +130,7 @@
                           {% endif %}
 
                           {% if med.additional_file %}
-                          <span class="mb-2 text-xs">File: <span class="text-dark ms-sm-2 font-weight-bold"><a href="{{ med.additional_file.url }}">{{ med.additional_file }}</a></span></span>
+                          <span class="mb-2 text-xs">File: <span class="text-dark ms-sm-2 font-weight-bold"><a href="{{ med.additional_file.url }}" target="_blank">{{ med.additional_file }}</a></span></span>
                           {% endif %}
 
                           
@@ -228,6 +228,13 @@
 
 {% block js%}
 
+
+<script>
+
+  let table = new DataTable('#med_cert_table')
+</script>
+
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
       var modal = document.getElementById('modal-approve');
@@ -248,8 +255,10 @@
           modal.querySelector('#reason-textarea').value = reason;
           modal.querySelector('#request_id').value = request_id;
           modal.querySelector('#patient_id').value = patient_id;
+
+
       });
   });
-  </script>
+</script>
 
 {% endblock %}
