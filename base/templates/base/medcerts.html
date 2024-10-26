@@ -6,6 +6,12 @@
 
 {% block css %}
 
+<style>
+  #select_patient {
+    width: 100% !important;
+}
+
+</style>
 
 {% endblock %}
 
@@ -19,11 +25,11 @@
           <div class="card-header pb-0 p-3">
             <div class="d-flex justify-content-between">
               <h6 class="mb-2">Medical Certificates</h6>
-              <h6 class="mb-0"><a href="" class="btn btn-sm btn-outline-secondary text-dark">Create Med-Cert</a></h6>
+              <h6 class="mb-0"><a class="btn btn-sm btn-outline-secondary text-dark" type="button" data-bs-toggle="modal" data-bs-target="#med-cert">Create Med-Cert</a></h6>
             </div>
           </div>
           <div class="table-responsive p-2">
-            {% if medcerts %}
+            {% if medcerts  %}
             <table class="table align-items-center mb-0" id="med_cert_table">
               <thead>
                 <tr>
@@ -37,6 +43,7 @@
                   <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Date Issued</th>
                   
                   <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Status</th>
+                  <th class="text-secondary opacity-7"></th>
                   <th class="text-secondary opacity-7"></th>
                 </tr>
               </thead>
@@ -76,11 +83,24 @@
 
                   <td class="text-center">
                     <p class="text-sm font-weight-bold mb-0">{{ med.status }}</p>
+                    {% if med.date_received %}
+                    <p class="text-sm text-secondary mb-0">{{ med.date_received}}</p>
+                    {% endif %}
                   </td>
 
                   <td class="align-middle text-center text-sm">
                     <span class="font-weight-bold text-secondary"><a href="{% url 'view-med-cert' med.id %}" type="button" target="_blank" class="btn btn-link text-dark text-sm mb-0 px-0 ms-4"><i class="fa fa-print text-lg me-1" aria-hidden="true"></i> Print</a></span>
                   </td>
+
+                  <td class="align-middle text-center text-sm">
+                    {% if med.status == 'Received' %}
+                    <a href="{% url 'receive_med_cert' med.id %}" class="receive-med-cert" data-bs-toggle="tooltip" data-bs-title="Received">
+                        <i class="fa fa-check"></i>
+                    </a>
+                    {% endif %}
+                </td>
+
+                  
 
                 </tr>
                 
@@ -107,9 +127,9 @@
           <div class="card-header d-flex justify-content-between align-items-center pb-0 px-3">
              <h6 class="mb-0">Pending Requests</h6>
              
-             <h6 class="mb-0"><a href="" class="btn btn-sm">View All Requests</a></h6>
           </div>
           <div class="card-body pt-4 p-3">
+            
              <ul class="list-group">
               {% for med in medcert_requests %}
                   {% if med.status == 'Pending' %}
@@ -162,6 +182,8 @@
 
                     </li>
 
+                   
+                    
 
                   {% endif %}
 
@@ -221,6 +243,55 @@
   </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="med-cert" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create Medical Certificate</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{% url 'create-med-cert' %}"  id="med-cert-form">
+        {% csrf_token %}
+        
+        <div class="modal-body">
+    
+
+              <div class="form-group">
+                <select class="my-select2" required name="patient_id" id="select_patient" style="width: 100%">
+                    <option value="" selected disabled>Select patient</option> <!-- Default option -->
+                    {% for p in patients %}
+                    <option value="{{ p.id }}">{{p}}</option>
+                    {% endfor %}
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="exampleFormControlInput1">Purpose: </label>
+                <input type="text" class="form-control" id="" name="purpose" placeholder="Medical Clearance">
+              </div>
+
+              <div class="form-group">
+                <label for="exampleFormControlTextarea1">Remarks</label>
+                <textarea class="form-control" name="remarks" id="" rows="3"></textarea>
+              </div>
+
+    
+
+
+
+      
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn bg-gradient-primary">Create Med-Cert</button>
+        </div>
+    </form>
+    </div>
+  </div>
+</div>
 
 
 {% endblock %}
@@ -228,6 +299,95 @@
 
 {% block js%}
 
+<script>
+  $(document).ready(function() {
+      // Handle click event for receiving med cert
+      $('.receive-med-cert').on('click', function(e) {
+          e.preventDefault(); // Prevent default link action
+
+          const url = $(this).attr('href'); // Get the URL from the link
+
+          // Show SweetAlert confirmation
+          Swal.fire({
+              icon: 'warning',
+              title: 'Confirm Receipt',
+              text: 'Are you sure you want to confirm that the patient is receiving the medical certificate?',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Yes, confirm!',
+              cancelButtonText: 'Cancel'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  // Redirect to the URL if confirmed
+                  window.location.href = url;
+              }
+          });
+      });
+  });
+</script>
+
+<script>
+  $(document).ready(function() {
+      $('#select_patient').select2({
+          placeholder: ".........................",
+          allowClear: true,
+      });
+
+      // Handle form submission with AJAX
+      $('#med-cert-form').on('submit', function(e) {
+          e.preventDefault(); // Prevent the default form submission
+
+          $.ajax({
+              type: "POST",
+              url: $(this).attr('action'),
+              data: $(this).serialize(),
+              success: function(response) {
+                  // Show success message
+                  Swal.fire({
+                      icon: 'success',
+                      title: 'Success!',
+                      text: 'Medical certificate created successfully.',
+                      confirmButtonText: 'OK'
+                  }).then((result) => {
+                      if (result.isConfirmed) {
+                          // Optionally, you can refresh the page or perform other actions
+                          location.reload(); // Reload the page
+                      }
+                  });
+              },
+              error: function(xhr, status, error) {
+                  // Handle error response if needed
+                  Swal.fire({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: 'Something went wrong! Please try again.',
+                      confirmButtonText: 'OK'
+                  });
+              }
+          });
+      });
+  });
+</script>
+
+<script>
+  jQuery(function() {
+
+    $('.my-select2').each(function() {
+      $(this).select2({
+        dropdownParent: $(this).parent(), // fix select2 search input focus bug
+      })
+    })
+  
+    // fix select2 bootstrap modal scroll bug
+    $(document).on('select2:close', '.my-select2', function(e) {
+      var evt = "scroll.select2"
+      $(e.target).parents().off(evt)
+      $(window).off(evt)
+    })
+  
+  })
+</script>
 
 <script>
 

@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import Patient
+from django.utils import timezone
 
 # Create your models here.
 
@@ -86,7 +87,7 @@ class Appointment(models.Model):
         return f"{self.date_created} - {self.patient} - {self.purpose}"
 
 
-    
+        
 
 class MedicalCertificateRequest(models.Model):
 
@@ -108,7 +109,7 @@ class MedicalCertificateRequest(models.Model):
 
 class MedicalCertificate(models.Model):
     
-    request_id = models.ForeignKey(MedicalCertificateRequest, on_delete=models.CASCADE)
+    request_id = models.ForeignKey(MedicalCertificateRequest, on_delete=models.CASCADE, null=True, blank=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     purpose = models.CharField(max_length=100)
 
@@ -118,6 +119,12 @@ class MedicalCertificate(models.Model):
 
     date_created = models.DateTimeField(auto_now_add=True)
 
+    date_received = models.DateTimeField(null=True, blank=True)
+
+    def mark_as_received(self):
+        self.date_received = timezone.now() 
+        self.status = 'Received' 
+        self.save()  
 
     status = models.CharField(max_length=12, choices=[('Pending', 'Pending'), ('Issued', 'Issued'), ('Received', 'Received')], default='Pending')
 

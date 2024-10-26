@@ -12,8 +12,8 @@ import calendar
 from django.db.models import Count, OuterRef, Subquery
 from django.db.models.functions import ExtractMonth
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
-
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.db import IntegrityError
 from io import BytesIO
 import qrcode
 
@@ -22,6 +22,9 @@ from django.core.files.base import ContentFile
 
 from .decorators import staff_only, patient_only
 
+from django.contrib.auth.models import User, Group
+from django.utils.crypto import get_random_string
+from django.urls import reverse
 
 def monthly_model_counts(request):
     # Define a function to get counts per month for a given model
@@ -347,6 +350,8 @@ def move_first_in_queue(request):
 
 def patients(request):
 
+    
+
     clinic_visits = ClinicConsultation.objects.filter(patient=OuterRef('pk')).annotate(
         visit_date=Subquery(ClinicConsultation.objects.filter(patient=OuterRef('pk')).values('date_created'))
     ).values('visit_date')
@@ -371,12 +376,21 @@ def patients(request):
         clinic_visits.union(bp_visits).union(dental_visits).union(appointment_visits).union(medical_certificates)
         .order_by('-visit_date')[:1]
     )
+    
+    patient_group = Group.objects.get(name='patient')
+    inactive_users = User.objects.filter(groups=patient_group, is_active=False)
 
     patients = Patient.objects.annotate(
         visit_count=Count('clinicconsultation') + Count('bpmonitoring') + Count('dentalcase') +
                     Count('appointment') + Count('medicalcertificate'),
         recent_visit_date=recent_visit_date
-    )
+    ).exclude(user__in=inactive_users)
+
+    
+
+
+
+    inactive_patients = Patient.objects.filter(user__in=inactive_users)
 
     patient_student_count = patients.filter(category = 'Student').count()
     patient_employee_count = patients.filter(category = 'Employee').count()
@@ -384,7 +398,8 @@ def patients(request):
     context = {
         'patients': patients,
         'patient_student_count': patient_student_count,
-        'patient_employee_count': patient_employee_count
+        'patient_employee_count': patient_employee_count,
+        'inactive_patients': inactive_patients
     }
     
     return render(request, 'base/patients.html', context)
@@ -396,14 +411,21 @@ def patient_account_request(request):
 
 
 def medcerts(request):
+    patients = Patient.objects.all()
     medcert_requests = MedicalCertificateRequest.objects.all().order_by('-date_created')
     medcerts = MedicalCertificate.objects.all().order_by('-date_created')
 
     context = {
+        'patients': patients,
         'medcerts': medcerts,
         'medcert_requests': medcert_requests
     }
     return render(request, 'base/medcerts.html', context)
+
+def receive_med_cert(request, medcert_id):
+    medcert = get_object_or_404(MedicalCertificate, id=medcert_id)
+    medcert.mark_as_received()
+    return redirect('medcerts')
 
 
 def medical_certificate_requests(request):
@@ -426,6 +448,45 @@ def medical_certificate_requests(request):
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
+def create_medcert(request):
+    if request.method == 'POST':
+        patient_id = request.POST.get('patient_id')
+        purpose = request.POST.get('purpose')
+        remarks = request.POST.get('remarks')
+
+        patient = get_object_or_404(Patient, id=patient_id)
+
+        medical_certificate = MedicalCertificate.objects.create(
+            request_id=None,
+            patient=patient,
+            purpose=purpose,
+            remarks=remarks,
+            status='Issued'
+        )
+        
+        qr_content = (
+            f"Medical Certificate\n"
+            f"Patient Name: {medical_certificate.patient.user.get_full_name()}\n"
+            f"Patient ID: {medical_certificate.patient.user_id_number}\n"
+            f"Purpose: {medical_certificate.purpose}\n"
+            f"Issue Date: {medical_certificate.date_created.strftime('%Y-%m-%d')}\n"
+            f"Certificate ID: {medical_certificate.id}\n"
+        )
+        # Create QR code
+        qr_image = qrcode.make(qr_content)
+
+        # Save QR code image to BytesIO
+        qr_image_io = BytesIO()
+        qr_image.save(qr_image_io, format='PNG')
+        qr_image_io.seek(0)  # Reset cursor to the start
+
+        # Save QR code to the model
+        qr_file_name = f'qr_codes/med_cert_{medical_certificate.id}.png'
+        medical_certificate.qr_code.save(qr_file_name, ContentFile(qr_image_io.getvalue()))
+
+        medical_certificate.save()
+
+        return JsonResponse({'message': 'Medical certificate created successfully'})
 
 
 def approve_med_cert_request(request):
@@ -695,6 +756,7 @@ def patient_profile(request, patient_id):
     certificates = MedicalCertificate.objects.filter(patient=patient).order_by('-date_created')
     appointment_requests = AppointmentRequest.objects.filter(patient=patient).order_by('-date_created')
 
+
     combined_records = []
 
     for consultation in clinic_consultation:
@@ -736,6 +798,7 @@ def patient_profile(request, patient_id):
             'date': certificate.date_created,
             'details': f"Purpose: {certificate.purpose}",
             'remarks': certificate.status,
+            'certificate': reverse('view-med-cert', args=[certificate.id]) 
         })
 
     for request_ in appointment_requests:
@@ -1047,4 +1110,113 @@ def add_medicine_usage(request, patient_id):
         return JsonResponse(response)
     
     return render(request, 'base/medicine_supply.html', {'patient': patient, 'medicines': medicines})
+
+
+
+def approve_user_request(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    
+    # Generate a new password
+    raw_password = get_random_string(length=8)  # You can customize the password length
+
+    # Set the password for the user
+    user.set_password(raw_password)
+    user.is_active = True
+    user.save()
+
+    # Send approval email notification with the raw password
+    subject = "Your Lyceum-Northwestern University Infirmary Account is Approved"
+    message = f"""
+    Hi {user.first_name.capitalize()} {user.last_name.capitalize()},
+
+    We are pleased to inform you that your account at Lyceum-Northwestern University Infirmary has been approved.
+    
+    You can now log in to your account using the following details:
+    Username: {user.username}
+    Password: {raw_password}
+
+    Thank you for choosing Lyceum-Northwestern University Infirmary.
+
+    Sincerely,
+    Lyceum-Northwestern University Infirmary Team
+    """
+    send_mail(
+        subject, message, 'noreply@lyceum.edu.ph', [user.email], fail_silently=False
+    )
+
+    return redirect('patients')
+
+def reject_user_request(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    
+    # Send rejection email notification
+    subject = "Your Lyceum-Northwestern University Infirmary Account Registration"
+    message = f"""
+    Hi {user.first_name.capitalize()} {user.last_name.capitalize()},
+
+    We regret to inform you that your account registration at Lyceum-Northwestern University Infirmary has been rejected.
+    
+    If you believe this is an error or if you have any questions, please contact us at support@lyceum.edu.ph.
+
+    Thank you for your understanding.
+
+    Sincerely,
+    Lyceum-Northwestern University Infirmary Team
+    """
+    send_mail(
+        subject, message, 'noreply@lyceum.edu.ph', [user.email], fail_silently=False
+    )
+
+    # Delete the user after sending the rejection email
+    user.delete()
+
+    return redirect('patients')
+
+
+
+def update_patient_information(request):
+    if request.method == 'POST':
+        patient_id = request.POST.get('patient_id')
+        category = request.POST.get('category')
+        designation = request.POST.get('designation')
+        email = request.POST.get('email')
+        contact_number = request.POST.get('contact_number')
+        address = request.POST.get('address')
+        avatar = request.FILES.get('avatar')
+
+        patient = get_object_or_404(Patient, id=patient_id)
+
+        # Check if the inputted email is the same as the existing email
+        if email != patient.user.email:
+            # Here you can perform a check to ensure the email is unique
+            if User.objects.filter(email=email).exists():
+                return JsonResponse({'status': 'error', 'message': 'Email already in use by another account.'}, status=400)
+
+        try:
+            patient.category = category
+            patient.designation = designation
+            patient.contact_number = contact_number
+            patient.address = address
+            patient.user.email = email
+            
+            if avatar:
+                patient.avatar = avatar
+            
+            patient.save()
+            patient.user.save()  
+            print(patient.user.email)
+            return JsonResponse({'status': 'success', 'message': 'Patient information updated successfully.'})
+
+        except IntegrityError as e:
+            print(f"IntegrityError: {e}")  # Log the detailed error message
+            return JsonResponse({'status': 'error', 'message': 'An error occurred while updating the patient information due to database constraints.'}, status=400)
+        except ValidationError as e:
+            return JsonResponse({'status': 'error', 'message': e.message}, status=400)
+        except Exception as e:
+            # Log the actual error for debugging (optional)
+            print(f"Unexpected error: {e}")
+            return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred while updating the patient information.'}, status=500)
+        
+
+
 

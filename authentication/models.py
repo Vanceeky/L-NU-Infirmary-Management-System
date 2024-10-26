@@ -13,8 +13,9 @@ class Patient(models.Model):
     category = models.CharField(max_length=8)
     designation = models.CharField(max_length=100)
     proof = models.FileField(upload_to='proofs/')
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True, default='/team-3.jpg')
-
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True, default='/L-NU_LOGO.png')
+    address = models.TextField(null=True, blank=True)
+    
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 

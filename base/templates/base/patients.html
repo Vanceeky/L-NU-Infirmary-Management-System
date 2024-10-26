@@ -17,11 +17,11 @@
 
 <div class="row my-4">
     <div class="col-lg-9 mb-lg-0 mb-4">
-        <div class="card ">
+        <div class="card" id="patient_list">
           <div class="card-header pb-0 p-3">
             <div class="d-flex justify-content-between">
               <h6 class="mb-2">List of Patients</h6>
-              <a href=""><i class="fa fa-paper-plane me-2"></i>Requests ( 0 ) </a>
+              <a href="javascript:void(0);" id="show_requests"><i class="fa fa-paper-plane me-2"></i>Requests ({{ inactive_patients.count }} )</a>
               <!--
               <button class="btn bg-gradient-info" data-bs-toggle="modal" data-bs-target="#modal-add-patient"><i class="fa fa-plus mx-2"></i>Add New Patient</button>
               -->
@@ -86,6 +86,91 @@
           </div>
 
         </div>
+
+        <div class="card " id="request_patients" style="display: none;">
+          <div class="card-header pb-0 p-3">
+            <div class="d-flex justify-content-between">
+              <h6 class="mb-2">Patient Account Approval</h6>
+              <a href="javascript:void(0);" id="show_patients" style="display: none;">Back to Patient List</a>
+              <!--
+              <button class="btn bg-gradient-info" data-bs-toggle="modal" data-bs-target="#modal-add-patient"><i class="fa fa-plus mx-2"></i>Add New Patient</button>
+              -->
+
+            </div>
+          </div>
+          <div class="table-responsive p-2">
+            <table class="table align-items-center mb-0 p-3" id="request_table">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-center text-secondary text-xs font-weight-bolder opacity-7">ID</th>
+                  
+                  <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Patient</th>
+                  <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-2">Contact</th>
+                  
+                  <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Category</th>
+                  <th class="text-uppercase text-center text-secondary text-xs font-weight-bolder opacity-7">Date Registered</th>
+                  <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Proof</th>
+                  <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7"></th>
+
+                </tr>
+              </thead>
+              <tbody>
+                {% for patient in inactive_patients %}
+
+                <tr>
+                  <td class="text-center">
+                    <span class="text-secondary text-sm font-weight-bold">{{ patient.user_id_number }}</span>
+                  </td>
+
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div>
+                        <img src="{{ patient.avatar.url }}" class="avatar avatar-md me-3" alt="user1">
+                      </div>
+                      <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-md"><a href="{% url 'patient-profile-dashboard' patient.user_id_number %}">{{ patient.user.first_name }} {{ patient.user.last_name}}</a></h6>
+                        <p class="text-sm text-secondary mb-0">{{ patient.gender }} ( {{ patient.age}} )</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="">
+                    <p class="text-sm font-weight-bold mb-0">{{ patient.contact_number }}</p>
+                    <p class="text-sm text-secondary mb-0">{{ patient.user.email }}</p>
+                  </td>
+                  <td class="text-center">
+                    <p class="text-sm font-weight-bold mb-0">{{ patient.category }}</p>
+                    <p class="text-sm text-secondary mb-0">{{ patient.designation }}</p>
+                  </td>
+                  <td class=" text-center">
+                    <span class="text-secondary text-sm font-weight-bold">{{ patient.date_created }} </span>
+                  </td>
+
+                  <td class="align-middle text-center text-sm">
+                    <span class="font-weight-bold text-secondary"><a href="{{ patient.proof.url }}"><i class="fa fa-file"></i> View Proof </span>
+                  </td>
+                  <td class="align-middle text-center text-sm">
+                    <span class="font-weight-bold text-secondary" data-bs-toggle="tooltip" data-bs-title="Approve request">
+                        <a href="#" class="approve-request" data-url="{% url 'approve-user-request' patient.user.id%}">
+                            <i class="fa fa-check-circle me-2"></i>
+                        </a>
+                    </span>
+                    <span class="font-weight-bold text-danger" data-bs-toggle="tooltip" data-bs-title="Deny request">
+                        <a href="#" class="deny-request" data-url="{% url 'reject-user-request' patient.user.id%}">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </span>
+                  </td>
+
+                </tr>
+                
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+
     </div>
     <div class="col-lg-3">
         <div class="card h-auto p-3">
@@ -304,6 +389,101 @@
 
 
   let patient_table = new DataTable('#patient_table')
+  let request_table = new DataTable('#request_table')
 </script>
 
+
+<script>
+  document.getElementById('show_requests').addEventListener('click', function() {
+    // Hide the patient list and show the request patients div
+    document.getElementById('patient_list').style.display = 'none';
+    document.getElementById('request_patients').style.display = 'block';
+
+    // Hide the "Requests" button and show the "Back to Patient List" button
+    document.getElementById('show_requests').style.display = 'none';
+    document.getElementById('show_patients').style.display = 'inline';
+});
+
+document.getElementById('show_patients').addEventListener('click', function() {
+    // Show the patient list and hide the request patients div
+    document.getElementById('patient_list').style.display = 'block';
+    document.getElementById('request_patients').style.display = 'none';
+
+    // Hide the "Back to Patient List" button and show the "Requests" button
+    document.getElementById('show_patients').style.display = 'none';
+    document.getElementById('show_requests').style.display = 'inline';
+});
+
+</script>
+<script>
+  // Approve request confirmation
+  document.querySelectorAll('.approve-request').forEach(function (element) {
+      element.addEventListener('click', function (event) {
+          event.preventDefault();  // Prevent the default action of the link
+          const url = this.getAttribute('data-url');
+          
+          Swal.fire({
+              title: 'Are you sure?',
+              text: "You are about to approve this user request!",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Yes, approve it!'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  // Show loading spinner
+                  Swal.fire({
+                      title: 'Processing...',
+                      text: 'Please wait while we approve the request.',
+                      allowOutsideClick: false,
+                      didOpen: () => {
+                          Swal.showLoading()
+                      }
+                  });
+
+                  // Redirect after a short delay to simulate processing
+                  setTimeout(() => {
+                      window.location.href = url;
+                  }, 1500);
+              }
+          });
+      });
+  });
+
+  // Deny request confirmation
+  document.querySelectorAll('.deny-request').forEach(function (element) {
+      element.addEventListener('click', function (event) {
+          event.preventDefault();  // Prevent the default action of the link
+          const url = this.getAttribute('data-url');
+          
+          Swal.fire({
+              title: 'Are you sure?',
+              text: "This user request will be denied and deleted!",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#3085d6',
+              confirmButtonText: 'Yes, deny it!'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  // Show loading spinner
+                  Swal.fire({
+                      title: 'Processing...',
+                      text: 'Please wait while we deny the request.',
+                      allowOutsideClick: false,
+                      didOpen: () => {
+                          Swal.showLoading()
+                      }
+                  });
+
+                  // Redirect after a short delay to simulate processing
+                  setTimeout(() => {
+                      window.location.href = url;
+                  }, 1500);
+              }
+          });
+      });
+  });
+</script>
 {% endblock %}

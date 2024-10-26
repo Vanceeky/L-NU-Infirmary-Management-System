@@ -11,6 +11,7 @@ urlpatterns = [
     path('patients/', views.patients, name="patients"),
     path('patient-profile/<str:patient_id>/', views.view_patient_dashboard, name="patient-profile-dashboard"),
     path('patient/<int:patient_id>/', views.patient_profile, name="patient-profile"),
+    path('patient/edit/', views.update_patient_information, name="update-patient-information"),
 
 
 
@@ -47,6 +48,8 @@ urlpatterns = [
     path('move-in-queue/', views.move_first_in_queue, name="move-first-in-queue"),
 
     path('medical-certificates/', views.medcerts, name="medcerts"),
+    path('create-med-cert/', views.create_medcert, name="create-med-cert"),
+    path('update-med-cert/<int:medcert_id>/', views.receive_med_cert, name="receive_med_cert"),
 
 
     path('request-med-cert/', views.request_medcert, name="request-medcert"),
@@ -57,6 +60,13 @@ urlpatterns = [
 
     path('api/monthly-model-counts/', views.monthly_model_counts, name='monthly_model_counts'),
     path('api/model-counts/', views.model_counts, name='model_counts'),
+
+
+
+
+
+    path('approve-user-request/<int:user_id>/', views.approve_user_request, name='approve-user-request'),
+    path('reject-user-request/<int:user_id>/', views.reject_user_request, name='reject-user-request'),
 
 
 ]

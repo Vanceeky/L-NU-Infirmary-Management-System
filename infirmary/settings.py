@@ -147,8 +147,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = '6d6a5edefc2f28'
-EMAIL_HOST_PASSWORD = '9a75c3728d6594'
-EMAIL_PORT = '2525'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'lnuinfirmary@gmail.com'
+EMAIL_HOST_PASSWORD = 'horv aysg yjoj noul'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
 

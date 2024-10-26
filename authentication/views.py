@@ -122,17 +122,20 @@ def register_user(request):
                 proof = request.FILES.get('proof')
 
                 # Generate a secure random password with at least 8 characters
-                chars = string.ascii_letters + string.digits
-                random_password = ''.join(random.choice(chars) for _ in range(8))
+                # Check if the user_id_number or email already exists
+                if Patient.objects.filter(user_id_number=user_id).exists():
+                    return JsonResponse({'status': 'error', 'message': 'User ID already exists'}, status=400)
+                if User.objects.filter(email=email).exists():
+                    return JsonResponse({'status': 'error', 'message': 'Email already in use'}, status=400)
+
 
                 # Create the User object with hashed password
                 user = User.objects.create_user(
                     username=user_id,
-                    password=random_password,
                     first_name=firstname,
                     last_name=lastname,
                     email=email,
-                    is_active=True,
+                    is_active=False,
                 )
 
 
@@ -156,10 +159,6 @@ def register_user(request):
                 Hi {firstname.capitalize()} {lastname.capitalize()},
 
                 This email confirms that you have successfully registered for an account at Lyceum-Northwestern University Infirmary.
-
-                Your login credentials are:
-                Username: {user_id}
-                Password: {random_password}
 
                 **Please note:** Your account is currently inactive and awaits approval. You will be notified within 24 hours regarding the status of your registration.
 
