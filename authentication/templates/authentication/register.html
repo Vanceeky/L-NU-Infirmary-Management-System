@@ -43,9 +43,13 @@
                 </div>
 
                 <div class="col-md-4">
-                    <div class="mb-3">
-                        <input type="tel" class="form-control" name="contact_number" placeholder="Contact Number" aria-label="Name" required>
+                  <div class="form-group">
+                    <div class="input-group">
+                      <span class="input-group-text" id="basic-addon1">+63</span>
+                      <input type="text" name="contact_number" class="form-control" maxlength="10" placeholder="Contact Number" aria-label="Username" aria-describedby="basic-addon1" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
+                  </div>
+
                 </div>
 
                 <div class="col-md-8">

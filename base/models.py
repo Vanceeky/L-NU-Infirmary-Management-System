@@ -54,6 +54,7 @@ class AppointmentRequest(models.Model):
     status_choices = [
 
         ('Pending', 'Pending'),
+        ('Notified', 'Notified'),
         ('Confirmed', 'Confirmed'),
         ('Cancelled', 'Cancelled'),
         ('Missed', 'Missed'),

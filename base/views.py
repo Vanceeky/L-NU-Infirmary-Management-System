@@ -25,6 +25,13 @@ from .decorators import staff_only, patient_only
 from django.contrib.auth.models import User, Group
 from django.utils.crypto import get_random_string
 from django.urls import reverse
+from twilio.rest import Client
+
+# Twilio configuration
+account_sid = 'ACc7dad14ba8cb5c1a9ab6f690839935da'
+auth_token = 'f238954cc6bf25a59bb58523413df7d0'
+client = Client(account_sid, auth_token)
+
 
 def monthly_model_counts(request):
     # Define a function to get counts per month for a given model
@@ -855,9 +862,8 @@ def patient_appointment_in_progress(request, appointment_id):
 
 
 
+
 def send_appointment_reminders(request):
-
-
     today = timezone.now().date()
 
     appointments = AppointmentRequest.objects.filter(
@@ -866,47 +872,58 @@ def send_appointment_reminders(request):
     )
 
     for appointment in appointments:
-        patient = appointment.patient
-        email = patient.user.email  # Assuming email is stored in the User model
+        patient = appointment.status = 'Notified'
 
-        # Craft a clear and informative email message
-        subject = f"L-NU Infimary Appointment Reminder: {appointment.date}"
+        appointment.save()
+
+        patient = appointment.patient
+        email = patient.user.email
+        phone_number = patient.contact_number  # Ensure this field exists for storing patient phone numbers
+
+        # Email message
+        subject = f"L-NU Infirmary Appointment Reminder: {appointment.date}"
         message = f"""
         Dear {patient.user.first_name.capitalize()} {patient.user.last_name.capitalize()},
 
         This is a friendly reminder that you have an appointment scheduled for today, {appointment.date}, at L-NU Infirmary.
 
-        We're happy to inform you that a doctor is now available to proceed with your appointment.
+        A doctor is now available to proceed with your appointment.
 
         **Important Information:**
-
         * Infirmary Hours: 9:00 AM - 4:00 PM
         * Please bring any necessary medical records or documents with you.
 
-        If you need to reschedule your appointment, kindly contact us as soon as possible.
-
         We look forward to seeing you soon!
-
+        
         Sincerely,
-
         L-NU Infirmary Staff
         """
 
-        # Send the email
+        # Send email
         try:
             send_mail(
                 subject,
                 message,
-                'your_clinic_email@example.com', 
+                'your_clinic_email@example.com',
                 [email],
-                fail_silently=False,  
+                fail_silently=False,
             )
         except Exception as e:
             print(f"Error sending email to {email}: {e}")
-    
-    return JsonResponse({'message': 'Emails sent successfully'})
 
+        # Send SMS
+        try:
+            sms_message = client.messages.create(
+                from_='+14014913327',
+                
+                body=f"Appointment Today LNU",
+                to='+639776288749'
+            )
+            print(f"SMS sent to {phone_number}, SID: {sms_message.sid}")
+        except Exception as e:
+            print(f"Error sending SMS to {phone_number}: {e}")
 
+    return JsonResponse({'message': 'Reminders sent successfully'})
 
 def send_cancel_appointment_reminder(request):
     today = timezone.now().date()
@@ -917,48 +934,50 @@ def send_cancel_appointment_reminder(request):
 
     for appointment in appointments:
         patient = appointment.patient
-        email = patient.user.email  # Assuming email is stored in the User model
-        
+        email = patient.user.email
+        phone_number = patient.contact_number
+
         # Update appointment status to 'Cancelled'
         appointment.status = 'Cancelled'
-        appointment.save()  # Save the change to the database
+        appointment.save()
 
-        # Craft a clear and informative email message
+        # Email message
         subject = f"L-NU Infirmary Appointment Cancellation: {appointment.date}"
         message = f"""
         Dear {patient.user.first_name.capitalize()} {patient.user.last_name.capitalize()},
 
         We regret to inform you that your appointment scheduled for today, {appointment.date}, at L-NU Infirmary has been cancelled due to the doctor's unavailability.
 
-        We apologize for any inconvenience this may cause. If you need to reschedule your appointment or have any questions, please contact us at your earliest convenience.
-
-        **Contact Information:**
-
-        * Phone: (Your Clinic Phone Number)
-        * Email: your_clinic_email@example.com
-
         Thank you for your understanding.
 
         Sincerely,
-
         L-NU Infirmary Staff
         """
 
-        # Send the email
+        # Send email
         try:
             send_mail(
                 subject,
                 message,
-                'your_clinic_email@example.com', 
+                'your_clinic_email@example.com',
                 [email],
-                fail_silently=False,  
+                fail_silently=False,
             )
         except Exception as e:
             print(f"Error sending email to {email}: {e}")
-    
-    return JsonResponse({'message': 'Emails sent successfully'})
 
+        # Send SMS
+        try:
+            sms_message = client.messages.create(
+                body=f"Appointment Cancelled",
+                from_='+14014913327',
+                to=phone_number
+            )
+            print(f"Cancellation SMS sent to {phone_number}, SID: {sms_message.sid}")
+        except Exception as e:
+            print(f"Error sending SMS to {phone_number}: {e}")
 
+    return JsonResponse({'message': 'Cancellations sent successfully'})
 
 
 

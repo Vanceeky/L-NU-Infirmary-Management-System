@@ -154,3 +154,15 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 
+
+JAZZMIN_SETTINGS = {
+    "site_title": "L-NU Infirmary",
+    "site_header": "L-NU Infirmary",
+    "site_logo": "/images/L-NU_LOGO2.png",
+    "welcome_sign": "Welcome to L-NU Infirmary Admin",
+    "site_logo_classes": "img-circle",
+    "favicon": "/images/L-NU_LOGO2.jpg",
+
+}
+
+

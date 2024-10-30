@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 class Patient(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_id_number = models.CharField(max_length=20, unique=True, null = True, blank = True)
-    contact_number = models.CharField(max_length=11)
+    contact_number = models.CharField(max_length=13)
     age = models.CharField(max_length=3, null = True, blank = True)
     gender = models.CharField(max_length=6)
     category = models.CharField(max_length=8)

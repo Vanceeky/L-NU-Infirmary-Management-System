@@ -35,9 +35,13 @@
             <div class="mb-3">
               <input type="text" name="username" class="form-control" placeholder="User ID" aria-label="Name">
             </div>
-            <div class="mb-3">
+            <div class="mb-1">
               <input type="password" name="password" class="form-control" placeholder="Password" aria-label="Password">
             </div>
+            
+            <p class="text-sm mb-0">Forgotten your password? <a href="{% url 'password_reset' %}" class="text-dark font-weight-bolder">Click here</a></p>
+
+
 
             <div class="text-center">
               <button type="submit" class="btn bg-gradient-dark w-100 my-4 mb-2">Login</button>

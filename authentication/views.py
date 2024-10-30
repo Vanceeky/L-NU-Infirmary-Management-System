@@ -146,7 +146,7 @@ def register_user(request):
                 patient = Patient.objects.create(
                     user=user,
                     user_id_number=user_id,
-                    contact_number=contact_number,
+                    contact_number=f"+63{contact_number}",
                     gender=gender,
                     age=calculate_age(birthdate),
                     category=category,
