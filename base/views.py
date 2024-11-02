@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404, HttpResponseForbidden, HttpResponse
 from . models import *
+from authentication.views import calculate_age
 from django.utils import timezone
 from django.http import JsonResponse
 from django.db.models import Q
@@ -16,7 +17,8 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError
 from io import BytesIO
 import qrcode
-
+from django.db import transaction
+from datetime import datetime, date
 
 from django.core.files.base import ContentFile
 
@@ -29,7 +31,7 @@ from twilio.rest import Client
 
 # Twilio configuration
 account_sid = 'ACc7dad14ba8cb5c1a9ab6f690839935da'
-auth_token = 'f238954cc6bf25a59bb58523413df7d0'
+auth_token = 'auth_token'
 client = Client(account_sid, auth_token)
 
 
@@ -411,6 +413,94 @@ def patients(request):
     
     return render(request, 'base/patients.html', context)
 
+
+def add_patient(request):
+    if request.method == 'POST':
+        try:
+            with transaction.atomic():
+                user_id = request.POST.get('user_id')
+                firstname = request.POST.get('firstname')
+                lastname = request.POST.get('lastname')
+                email = request.POST.get('email')
+                birthdate_str = request.POST.get('birthdate')
+                birthdate = datetime.strptime(birthdate_str, '%Y-%m-%d').date()
+                contact_number = request.POST.get('contact_number')
+                gender = request.POST.get('gender')
+                category = request.POST.get('category')
+                designation = request.POST.get('designation')
+
+
+                if Patient.objects.filter(user_id_number=user_id).exists():
+                    return JsonResponse({'status': 'error', 'message': 'User ID already exists'}, status=400)
+                if User.objects.filter(email=email).exists():
+                    return JsonResponse({'status': 'error', 'message': 'Email already in use'}, status=400)
+
+                raw_password = get_random_string(length=8)
+
+
+                # Create the User object with hashed password
+                user = User.objects.create_user(
+                    username=user_id,
+                    first_name=firstname,
+                    last_name=lastname,
+                    email=email,
+                    is_active=True,
+                )
+
+                user.set_password(raw_password)
+                user.save()
+
+
+                patient_group, created = Group.objects.get_or_create(name='patient')
+                user.groups.add(patient_group)
+
+                # Create the Patient object
+                patient = Patient.objects.create(
+                    user=user,
+                    user_id_number=user_id,
+                    contact_number=f"+63{contact_number}",
+                    gender=gender,
+                    age=calculate_age(birthdate),
+                    category=category,
+                    designation=designation,
+                 
+                )
+
+                subject = "Your Lyceum-Northwestern University Infirmary Account is Approved"
+                message = f"""
+                Hi {user.first_name.capitalize()} {user.last_name.capitalize()},
+
+                We are pleased to inform you that your account at Lyceum-Northwestern University Infirmary has been approved.
+                
+                You can now log in to your account using the following details:
+                Username: {user.username}
+                Password: {raw_password}
+
+                Thank you for choosing Lyceum-Northwestern University Infirmary.
+
+                Sincerely,
+                Lyceum-Northwestern University Infirmary Team
+                """
+                send_mail(
+                    subject, message, 'noreply@lyceum.edu.ph', [user.email], fail_silently=False
+                )
+
+                message = 'Patient added successfully'
+
+                return JsonResponse({'status': 'success', 'message': message}, status=201)
+
+        except IntegrityError:
+            return JsonResponse({'status': 'error', 'message': 'User ID already exists'}, status=400)
+        except ValidationError as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+        except ValueError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid date format'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred'}, status=500)
+
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+    
 
 
 def patient_account_request(request):
@@ -917,7 +1007,7 @@ def send_appointment_reminders(request):
                 from_='+14014913327',
                 
                 body=f"Appointment Today LNU",
-                to='+639776288749'
+                to='+6309776288749'
             )
             print(f"SMS sent to {phone_number}, SID: {sms_message.sid}")
         except Exception as e:
@@ -971,9 +1061,10 @@ def send_cancel_appointment_reminder(request):
             sms_message = client.messages.create(
                 body=f"Appointment Cancelled",
                 from_='+14014913327',
-                to=phone_number
+                 to='+6309776288749'
             )
             print(f"Cancellation SMS sent to {phone_number}, SID: {sms_message.sid}")
+            
         except Exception as e:
             print(f"Error sending SMS to {phone_number}: {e}")
 

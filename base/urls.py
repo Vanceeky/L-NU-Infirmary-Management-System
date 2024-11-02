@@ -10,6 +10,7 @@ urlpatterns = [
     path('daily-logs/', views.daily_logs, name="daily-logs"),
     
     path('patients/', views.patients, name="patients"),
+    path('add-patient/', views.add_patient, name="add-patient"),
     path('patient-profile/<str:patient_id>/', views.view_patient_dashboard, name="patient-profile-dashboard"),
     path('patient/<int:patient_id>/', views.patient_profile, name="patient-profile"),
     path('patient/edit/', views.update_patient_information, name="update-patient-information"),

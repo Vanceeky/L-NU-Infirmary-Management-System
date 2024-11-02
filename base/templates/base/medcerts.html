@@ -93,7 +93,8 @@
                   </td>
 
                   <td class="align-middle text-center text-sm">
-                    {% if med.status == 'Received' %}
+                    {% if med.status == 'Issued' %}
+
                     <a href="{% url 'receive_med_cert' med.id %}" class="receive-med-cert" data-bs-toggle="tooltip" data-bs-title="Received">
                         <i class="fa fa-check"></i>
                     </a>
