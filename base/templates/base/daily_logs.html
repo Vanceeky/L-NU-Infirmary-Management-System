@@ -205,7 +205,7 @@
                                 <img src="{{ bp.patient.avatar.url }}" class="avatar avatar-sm me-3" alt="user1">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm text-capitalize">{{ bp.patient.user.first_name}} {{ bp.patient.user.last_name}} ({{ bp.patient.gender}}, {{ bp.patient.age}})</h6>
+                                <h6 class="mb-0 text-sm text-capitalize"><a href="{% url 'patient-profile-dashboard' bp.patient.user_id_number %}">{{ bp.patient.user.first_name}} {{ bp.patient.user.last_name}} ({{ bp.patient.gender}}, {{ bp.patient.age}})</a></h6>
                                 <p class="text-xs text-secondary mb-0">{{ bp.patient.user.email}}</p>
                               </div>
                             </div>
@@ -277,7 +277,7 @@
                                 <img src="{{ bp.patient.avatar.url }}" class="avatar avatar-sm me-3" alt="user1">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm text-capitalize">{{ bp.patient.user.first_name}} {{ bp.patient.user.last_name}} ({{ bp.patient.gender}}, {{ bp.patient.age}})</h6>
+                                <h6 class="mb-0 text-sm text-capitalize"><a href="{% url 'patient-profile-dashboard' bp.patient.user_id_number %}">{{ bp.patient.user.first_name}} {{ bp.patient.user.last_name}} ({{ bp.patient.gender}}, {{ bp.patient.age}})</a></h6>
                                 <p class="text-xs text-secondary mb-0">{{ bp.patient.user.email}}</p>
                               </div>
                             </div>
@@ -328,6 +328,7 @@
                           <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Category</th>
                           <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Vaccine Name </th>
                           <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Dose</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Amount Paid</th>
                     
                           <th class="text-secondary opacity-7"></th>
                         </tr>
@@ -348,7 +349,7 @@
                                 <img src="{{ vac.patient.avatar.url }}" class="avatar avatar-sm me-3" alt="user1">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm text-capitalize">{{ vac.patient.user.first_name}} {{ vac.patient.user.last_name}} ({{ vac.patient.gender}}, {{ vac.patient.age}})</h6>
+                                <h6 class="mb-0 text-sm text-capitalize"><a href="{% url 'patient-profile-dashboard' vac.patient.user_id_number %}">{{ vac.patient.user.first_name}} {{ vac.patient.user.last_name}} ({{ vac.patient.gender}}, {{ vac.patient.age}})</a></h6>
                                 <p class="text-xs text-secondary mb-0">{{ vac.patient.user.email}}</p>
                               </div>
                             </div>
@@ -362,6 +363,10 @@
                           </td>
                           <td class="align-middle text-center text-sm">
                             <span class="">{{ vac.dose }}</span>
+                          </td>
+                          <td class="text-center">
+                            <p class="text-xs font-weight-bold mb-0">₱ {{ vac.amount_paid}}</p>
+                            <p class="text-xs text-secondary mb-0">Receipt: {{ vac.or_number}}</p>
                           </td>
                           <td class="align-middle">
                             <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip"
@@ -648,6 +653,7 @@
               </div>
 
               <div id="vaccination" class="form-section">
+
                 <div class="row">
                   <div class="col-lg-8">
                     <div class="form-group">
@@ -672,6 +678,25 @@
 
 
                 </div>
+
+                <div class="row">
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="treatment_needed">Amount Paid:</label>
+                      <input type="number" class="form-control" id="amount_paid" name="amount_paid"required >
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="treatment_needed">OR Number:</label>
+                      <input type="number" class="form-control" id="or_number" name="or_number" required >
+                    </div>
+                  </div>
+                  
+                </div>
+
               </div>
 
 

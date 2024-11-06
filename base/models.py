@@ -42,6 +42,8 @@ class Vaccination(models.Model):
     vaccine_name = models.CharField(max_length=100)
     dose = models.CharField(max_length=100, choices=[ ('1st Dose / Booster', '1st Dose/Booster'), ('2nd Dose', '2nd Dose'), ('3rd Dose', '3rd Dose')])
     next_dose_due = models.DateField(null=True, blank=True)
+    amount_paid = models.IntegerField(null=True, blank=True)
+    or_number = models.CharField(max_length=100, null=True, blank=True)
 
     date_created = models.DateTimeField(auto_now_add=True)
 

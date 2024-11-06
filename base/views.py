@@ -30,9 +30,9 @@ from django.urls import reverse
 from twilio.rest import Client
 
 # Twilio configuration
-account_sid = 'ACc7dad14ba8cb5c1a9ab6f690839935da'
-auth_token = 'auth_token'
-client = Client(account_sid, auth_token)
+#account_sid = 'AC992d54f36d2f2086f5708eefad283305'
+#auth_token = 'e01c84aa7acced4f10d9290d5a065e49'
+#client = Client(account_sid, auth_token)
 
 
 def monthly_model_counts(request):
@@ -735,6 +735,8 @@ def add_vaccination(request):
         patient_id = request.POST.get('patient_id')
         vaccine_name = request.POST.get('vaccine_name')
         dose = request.POST.get('dose')
+        amount_paid = request.POST.get('amount_paid')
+        or_number = request.POST.get('or_number')
 
         next_dose_due = request.POST.get('next_dose_due')
         if next_dose_due == '':
@@ -746,7 +748,9 @@ def add_vaccination(request):
             patient = patient,
             vaccine_name = vaccine_name,
             dose = dose,
-            next_dose_due = next_dose_due
+            next_dose_due = next_dose_due,
+            amount_paid = amount_paid,
+            or_number = or_number
         )
 
         vaccination.save()
@@ -994,7 +998,7 @@ def send_appointment_reminders(request):
             send_mail(
                 subject,
                 message,
-                'your_clinic_email@example.com',
+                'lnuinfirmary@gmail.com',
                 [email],
                 fail_silently=False,
             )
@@ -1002,16 +1006,20 @@ def send_appointment_reminders(request):
             print(f"Error sending email to {email}: {e}")
 
         # Send SMS
+
+        '''
         try:
             sms_message = client.messages.create(
-                from_='+14014913327',
+                from_='+12405585942',
                 
                 body=f"Appointment Today LNU",
-                to='+6309776288749'
+                to='+639456656707'
             )
-            print(f"SMS sent to {phone_number}, SID: {sms_message.sid}")
+            print(f"Appointment Reminder sent to {sms_message.to}, SID: {sms_message.sid}")
         except Exception as e:
             print(f"Error sending SMS to {phone_number}: {e}")
+        '''
+
 
     return JsonResponse({'message': 'Reminders sent successfully'})
 
@@ -1049,24 +1057,28 @@ def send_cancel_appointment_reminder(request):
             send_mail(
                 subject,
                 message,
-                'your_clinic_email@example.com',
+                'lnuinfirmary@gmail.com',
                 [email],
                 fail_silently=False,
             )
         except Exception as e:
             print(f"Error sending email to {email}: {e}")
 
+
         # Send SMS
+        '''
         try:
             sms_message = client.messages.create(
                 body=f"Appointment Cancelled",
-                from_='+14014913327',
-                 to='+6309776288749'
+                from_='+12405585942',
+                to='+639456656707'
             )
-            print(f"Cancellation SMS sent to {phone_number}, SID: {sms_message.sid}")
+            print(f"Cancellation SMS sent to {sms_message.to}, SID: {sms_message.sid}")
             
         except Exception as e:
             print(f"Error sending SMS to {phone_number}: {e}")
+        '''
+
 
     return JsonResponse({'message': 'Cancellations sent successfully'})
 
